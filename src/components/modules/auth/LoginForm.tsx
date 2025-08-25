@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Eye, EyeOff } from "lucide-react"
+import { useState } from "react"
 
 import {
   Form,
@@ -13,6 +15,9 @@ import {
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useLoginMutation } from "@/redux/features/auth/auth.api"
+import { toast } from "sonner"
+import { useNavigate } from "react-router"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -28,6 +33,8 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
 
+  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,8 +43,20 @@ export function LoginForm({
     },
   })
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data)
+  const [login] = useLoginMutation()
+
+  const onSubmit = async(data: z.infer<typeof formSchema>) => {
+    try {
+      const res = await login(data).unwrap()
+      console.log(res)
+      if(res.success){
+        toast.success("Login successful")
+        form.reset()
+        navigate("/")
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
   
   return (
@@ -64,7 +83,26 @@ export function LoginForm({
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your password" type="password" {...field} />
+                  <div className="relative">
+                    <Input 
+                      placeholder="Enter your password" 
+                      type={showPassword ? "text" : "password"} 
+                      {...field} 
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

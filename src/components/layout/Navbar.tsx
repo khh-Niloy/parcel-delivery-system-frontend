@@ -11,7 +11,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
+import { authApi, useUserInfoQuery, useUserLogoutMutation } from "@/redux/features/auth/auth.api"
+import { useAppDispatch } from "@/redux/hooks"
 
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
@@ -20,7 +22,20 @@ const navigationLinks = [
   { href: "#", label: "Contact" },
 ]
 
+
 export default function Navbar() {
+  const {data: user, isLoading} = useUserInfoQuery(undefined)
+  console.log(user?.data.role)
+  const [logout, {isLoading: isLogoutLoading}] = useUserLogoutMutation()
+  const navigate = useNavigate()
+  const dispatch = useAppDispatch()
+
+  const handleLogout = async () => {
+    await logout(undefined)
+    dispatch(authApi.util.resetApiState())
+    navigate("/")
+  }
+
   return (
     <header className="border-b px-4 md:px-6">
       <div className="flex h-16 justify-between gap-4">
@@ -101,15 +116,30 @@ export default function Navbar() {
         {/* Right side */}
         <div className="flex items-center gap-2">
           <div>
-            <Button  variant="ghost" size="sm" className="text-sm gap-7">
-              <Link to="/login">Login</Link>
-            </Button>
-            <Button  variant="ghost" size="sm" className="text-sm gap-7">
-              <Link to="/register">Register</Link>
-            </Button>
+            {
+              user ? <div>
+                {/* <Button  variant="ghost" size="sm" className="text-sm gap-7">
+                  <Link to="/profile">Profile</Link>
+                </Button> */}
+                <Button onClick={handleLogout} variant="destructive" size="sm" className="text-sm gap-7">
+                  Logout
+                </Button>
+              </div> :
+              <>
+              <div className="flex gap-2">
+                <Button  variant="ghost" size="sm" className="text-sm gap-7">
+                  <Link to="/login">Login</Link>
+                </Button>
+                <Button  variant="ghost" size="sm" className="text-sm gap-7">
+                  <Link to="/register">Register</Link>
+                </Button>
+              </div>
+              </> 
+            }
+            
           </div>
           <Button asChild size="sm" className="text-sm">
-            <a href="#">Get Started</a>
+            <Link to={`/${user?.data.role?.toLowerCase()}`}>Dashboard</Link>
           </Button>
         </div>
       </div>

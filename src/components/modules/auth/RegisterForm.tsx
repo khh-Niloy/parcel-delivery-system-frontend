@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Eye, EyeOff } from "lucide-react"
+import { useState } from "react"
 
 import {
   Form,
@@ -21,7 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
+import { useRegisterMutation } from "@/redux/features/auth/auth.api"
+import { toast } from "sonner"
+import { useNavigate } from "react-router"
+    
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
@@ -48,6 +53,8 @@ export function RegisterForm({
   ...props
 }: React.ComponentProps<"div">) {
 
+  const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -56,12 +63,25 @@ export function RegisterForm({
       password: "",
       address: "",
       phone: "",
-      role: "RECEIVER",
+      role: "SENDER" as "RECEIVER" | "SENDER",
     },
   })
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data)
+  const [register] = useRegisterMutation()
+
+  const onSubmit = async(data: z.infer<typeof formSchema>) => {
+    try {
+      console.log(data)
+    const res = await register(data).unwrap()
+    console.log(res)
+    if(res.data.success){
+      toast.success("Registration successful")
+      navigate("/login")
+      form.reset()
+    }
+    } catch (error) {
+      console.log(error)
+    }
   }
   
   return (
@@ -103,7 +123,26 @@ export function RegisterForm({
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your password" type="password" {...field} />
+                <div className="relative">
+                  <Input 
+                    placeholder="Enter your password" 
+                    type={showPassword ? "text" : "password"} 
+                    {...field} 
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
