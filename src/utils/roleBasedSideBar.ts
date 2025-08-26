@@ -2,6 +2,7 @@ import { Role, type TRole } from "@/contant/Role";
 import { adminRoutes } from "@/routes/adminRoutes";
 import { senderRoutes } from "@/routes/senderRoutes";
 import { deliveryAgentRoutes } from "@/routes/deliveryAgentRoutes";
+import { receiverRoutes } from "@/routes/receiverRoutes";
 
 export const roleBasedSidebar = (role: TRole)=>{
     // console.log(role)
@@ -14,6 +15,9 @@ export const roleBasedSidebar = (role: TRole)=>{
 
         case Role.deliveryAgent:
         return [...deliveryAgentRoutes]
+
+        case Role.receiver:
+        return [...receiverRoutes]
 
         default:
         return [];

@@ -12,6 +12,7 @@ import { senderRoutes } from "./senderRoutes";
 import DeliveryAgentRegisterPage from "@/pages/auth/DeliveryAgentRegisterPage";
 import { deliveryAgentRoutes } from "./deliveryAgentRoutes";
 import UnauthorizedPage from "@/pages/Unauthorized";
+import { receiverRoutes } from "./receiverRoutes";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,17 @@ export const router = createBrowserRouter([
             element: <Navigate to="/delivery-agent/all-parcel" />
         },
         ...generateRoutes(deliveryAgentRoutes)
+    ]
+  },
+  {
+    path: "/receiver",
+    Component: checkRole(DashboardLayout, Role.receiver as TRole),
+    children: [
+        {
+            index: true,
+            element: <Navigate to="/receiver/incoming-parcel" />
+        },
+        ...generateRoutes(receiverRoutes)
     ]
   },
   {

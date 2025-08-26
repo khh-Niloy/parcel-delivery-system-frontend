@@ -1,4 +1,4 @@
-import { useAllParcelsAdminQuery, useAssignDeliveryAgentMutation, useUpdateParcelStatusMutation } from "@/redux/features/parcel/parcel.api"
+import { useDeliveredParcelsQuery, useUpdateParcelStatusMutation } from "@/redux/features/parcel/parcel.api"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
@@ -9,14 +9,14 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 
-export default function AllParcelsAdmin() {
+export default function ReceiverDeliveredAndConfirmedParcel() {
 
-    const { data, isLoading, isError } = useAllParcelsAdminQuery(undefined)
+    // NOTE: Using admin list for now; ideally there should be an endpoint for agent-assigned parcels
+    const { data, isLoading, isError } = useDeliveredParcelsQuery(undefined)
     const { data: meData } = useUserInfoQuery(undefined)
-    const parcels: any[] = Array.isArray(data) ? data : []
-    const [updateParcel, { isLoading: isUpdating }] = useUpdateParcelStatusMutation()
-    const [assignDeliveryAgent] = useAssignDeliveryAgentMutation()
 
+    const parcels: any[] = Array.isArray(data?.data) ? data?.data : []
+    const [updateParcel, { isLoading: isUpdating }] = useUpdateParcelStatusMutation()
     const [openDetailsIds, setOpenDetailsIds] = useState<Set<string>>(new Set())
     const [notes, setNotes] = useState<{ [key: string]: string }>({})
 
@@ -45,15 +45,11 @@ export default function AllParcelsAdmin() {
         return <div>No parcels found.</div>
     }
 
-    console.log(parcels)
-
-    
-
     return (
         <div className="w-full">
-            <h1 className="text-2xl font-bold mb-6">All Parcels</h1>
+            <h1 className="text-2xl font-bold mb-6">My Parcels</h1>
             <Table>
-                <TableCaption>All parcels in the system.</TableCaption>
+                <TableCaption>Parcels relevant to your deliveries.</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead>Tracking ID</TableHead>
@@ -66,47 +62,36 @@ export default function AllParcelsAdmin() {
                 <TableBody>
                     {parcels.map((p) => {
                         const hasTrackingEvents = Array.isArray(p?.trackingEvents) && p.trackingEvents.length > 0
-                        
+
                         const currentStatus: string = p?.status
                         const nextStatuses: string[] = Array.isArray(StatusFlow[currentStatus]?.next) ? StatusFlow[currentStatus].next : []
                         const allowedRolesForCurrent: string[] = Array.isArray(StatusFlow[currentStatus]?.allowedRoles) ? StatusFlow[currentStatus].allowedRoles : []
                         const userRole: string | undefined = meData?.data?.role
+
+                        // Delivery agent can change status only if allowed by the flow for current status
                         const canChangeThisStatus = userRole ? allowedRolesForCurrent.includes(userRole) : false
 
                         const handleChangeStatus = async (nextStatus: string) => {
                             try {
-
-                                if(nextStatus === "DISPATCHED"){
-                                    const payload = {
-                                        trackingId: p?.trackingId,
-                                    }
-                                    const res = await assignDeliveryAgent(payload).unwrap()
-                                    console.log(res)
-                                    if (res?.success) {
-                                        toast.success("Delivery agent assigned successfully")
-                                    }
-                                    return
-                                }
-                                
                                 const note = notes[p?.trackingId] || ""
-                                const payload = { 
+                                const payload = {
                                     trackingId: p?.trackingId,
                                     status: nextStatus,
                                     note: note,
                                     updatedBy: meData?.data?.role
                                 }
-                                console.log(payload)
                                 const res = await updateParcel(payload).unwrap()
-                                console.log(res)
-                                // Clear the note after successful update
+                                if (res?.success) {
+                                    toast.success("Status updated successfully")
+                                }
                                 setNotes(prev => {
                                     const newNotes = { ...prev }
                                     delete newNotes[p?.trackingId]
                                     return newNotes
                                 })
-                                toast.success("Status updated successfully")
                             } catch (error) {
                                 console.error(error)
+                                toast.error("Failed to update status")
                             }
                         }
 
@@ -128,13 +113,13 @@ export default function AllParcelsAdmin() {
                                     <TableCell>
                                         <div className="space-y-1 max-w-xs">
                                             <div>
-                                                <strong>From:</strong> 
+                                                <strong>From:</strong>
                                                 <span className="text-sm text-muted-foreground block truncate" title={p?.pickupAddress}>
                                                     {p?.pickupAddress}
                                                 </span>
                                             </div>
                                             <div>
-                                                <strong>To:</strong> 
+                                                <strong>To:</strong>
                                                 <span className="text-sm text-muted-foreground block truncate" title={p?.deliveryAddress}>
                                                     {p?.deliveryAddress}
                                                 </span>
@@ -147,9 +132,12 @@ export default function AllParcelsAdmin() {
                                                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                                     p?.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
                                                     p?.status === 'APPROVED' ? 'bg-blue-100 text-blue-800' :
+                                                    p?.status === 'DISPATCHED' ? 'bg-indigo-100 text-indigo-800' :
                                                     p?.status === 'IN_TRANSIT' ? 'bg-purple-100 text-purple-800' :
                                                     p?.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
+                                                    p?.status === 'RETURNED' ? 'bg-orange-100 text-orange-800' :
                                                     p?.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                                                    p?.status === 'BLOCKED' ? 'bg-gray-200 text-gray-800' :
                                                     'bg-gray-100 text-gray-800'
                                                 }`}>
                                                     {p?.status}

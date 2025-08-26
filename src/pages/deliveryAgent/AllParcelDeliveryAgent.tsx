@@ -1,4 +1,4 @@
-import { useAllParcelsAdminQuery, useAssignDeliveryAgentMutation, useUpdateParcelStatusMutation } from "@/redux/features/parcel/parcel.api"
+import { useAllParcelsAdminQuery, useUpdateParcelStatusMutation } from "@/redux/features/parcel/parcel.api"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
@@ -17,11 +17,9 @@ export default function AllParcelDeliveryAgent() {
 
     const allowedParcels = data?.filter((e: any) => e.status.includes("IN_TRANSIT") ||  
     e.status.includes("DISPATCHED") || e.status.includes("DELIVERED") || e.status.includes("CONFIRMED"))
-    console.log(allowedParcels)
 
     const parcels: any[] = Array.isArray(allowedParcels) ? allowedParcels : []
     const [updateParcel, { isLoading: isUpdating }] = useUpdateParcelStatusMutation()
-    const [assignDeliveryAgent, { isLoading: isAssigning }] = useAssignDeliveryAgentMutation()
     const [openDetailsIds, setOpenDetailsIds] = useState<Set<string>>(new Set())
     const [notes, setNotes] = useState<{ [key: string]: string }>({})
 
