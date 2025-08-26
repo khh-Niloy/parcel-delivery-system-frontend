@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select"
 import { useRegisterMutation } from "@/redux/features/auth/auth.api"
 import { toast } from "sonner"
-import { useNavigate } from "react-router"
+import { useNavigate, Link } from "react-router"
     
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -201,11 +201,16 @@ export function RegisterForm({
         <Button type="submit">Submit</Button>
       </form>
     </Form>
-    <div className="text-center text-sm">
+    <div className="text-center text-sm flex flex-col gap-2">
       Already have an account?{" "}
-      <a href="/login" className="text-primary hover:underline">
+      <Link to="/login" className="text-primary hover:underline">
         Login here
-      </a>
+      </Link>
+
+      Want to be a delivery partner?{" "}
+      <Link to="/delivery-partner/register" className="text-primary hover:underline">
+        Register here
+      </Link>
     </div>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}

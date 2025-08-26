@@ -9,6 +9,9 @@ import { Role, type TRole } from "@/contant/Role";
 import { generateRoutes } from "@/utils/generateRoutes";
 import { adminRoutes } from "./adminRoutes";
 import { senderRoutes } from "./senderRoutes";
+import DeliveryAgentRegisterPage from "@/pages/auth/DeliveryAgentRegisterPage";
+import { deliveryAgentRoutes } from "./deliveryAgentRoutes";
+import UnauthorizedPage from "@/pages/Unauthorized";
 
 export const router = createBrowserRouter([
   {
@@ -44,6 +47,17 @@ export const router = createBrowserRouter([
     ]
   },
   {
+    path: "/delivery-agent",
+    Component: checkRole(DashboardLayout, Role.deliveryAgent as TRole),
+    children: [
+        {
+            index: true,
+            element: <Navigate to="/delivery-agent/all-parcel" />
+        },
+        ...generateRoutes(deliveryAgentRoutes)
+    ]
+  },
+  {
     path: "/register",
     Component: RegisterPage,
   },
@@ -51,4 +65,12 @@ export const router = createBrowserRouter([
     path: "/login",
     Component: LoginPage,
   },
+  {
+    path: "/delivery-partner/register",
+    Component: DeliveryAgentRegisterPage,
+  },
+  {
+    path: "/unauthorized",
+    Component: UnauthorizedPage,
+  }
 ]);

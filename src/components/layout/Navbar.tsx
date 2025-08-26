@@ -26,6 +26,13 @@ const navigationLinks = [
 export default function Navbar() {
   const {data: user, isLoading} = useUserInfoQuery(undefined)
   console.log(user?.data.role)
+
+  let role = user?.data.role
+
+  if(role === "DELIVERY_AGENT"){
+    role = "delivery-agent"
+  }
+
   const [logout, {isLoading: isLogoutLoading}] = useUserLogoutMutation()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -139,7 +146,7 @@ export default function Navbar() {
             
           </div>
           <Button asChild size="sm" className="text-sm">
-            <Link to={`/${user?.data.role?.toLowerCase()}`}>Dashboard</Link>
+            <Link to={`/${role?.toLowerCase()}`}>Dashboard</Link>
           </Button>
         </div>
       </div>

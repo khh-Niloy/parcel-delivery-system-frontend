@@ -48,6 +48,14 @@ export const parcelApi = baseApi.injectEndpoints({
                 data: parcelInfo
             }),
         }),
+
+        assignDeliveryAgent: builder.mutation({
+            query: (parcelInfo)=>({
+                url: `/parcel/assign-delivery-agent/${parcelInfo.trackingId}`,
+                method: "PATCH",
+                data: parcelInfo
+            }),
+        }),
         
     })
 })
@@ -59,4 +67,5 @@ export const {
     useGetParcelByIdQuery,
     useAllParcelsAdminQuery,
     useUpdateParcelStatusMutation,
+    useAssignDeliveryAgentMutation,
 } = parcelApi;
