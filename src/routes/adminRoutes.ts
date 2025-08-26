@@ -1,3 +1,4 @@
+import AllParcelsAdmin from "@/pages/admin/AllParcelsAdmin";
 import AllUser from "@/pages/admin/AllUser";
 
 export const adminRoutes = [
@@ -6,9 +7,14 @@ export const adminRoutes = [
     items: [
       {
         title: "All User",
-        url: "user/all-user",
+        url: "/admin/all-user",
         component: AllUser,
       },
-    ],
+      {
+        title: "All Parcel",
+        url: "/admin/all-parcel",
+        component: AllParcelsAdmin,
+      },
+    ],  
   },
 ];

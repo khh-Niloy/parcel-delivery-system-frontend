@@ -27,7 +27,7 @@ export const router = createBrowserRouter([
     children: [
         {
             index: true,
-            element: <Navigate to="admin/user/all-user" />
+            element: <Navigate to="/admin/all-user" />
         },
         ...generateRoutes(adminRoutes)
     ]

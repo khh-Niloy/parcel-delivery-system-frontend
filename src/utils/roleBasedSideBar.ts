@@ -8,9 +8,6 @@ export const roleBasedSidebar = (role: TRole)=>{
         case Role.admin:
         return [...adminRoutes];
 
-        case Role.superAdmin:
-        return [...adminRoutes];
-
         case Role.sender:
         return [...senderRoutes]
 

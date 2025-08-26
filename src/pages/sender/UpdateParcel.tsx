@@ -1,6 +1,9 @@
+import { useNavigate, useParams } from "react-router"
+import { useGetParcelByIdQuery, useUpdateParcelMutation } from "@/redux/features/parcel/parcel.api"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { useEffect } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,15 +16,14 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-  } from "@/components/ui/popover"
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
-import { useCreateParcelMutation } from "@/redux/features/parcel/parcel.api"
 import { toast } from "sonner"
 
 const parcelSchema = z.object({
@@ -34,7 +36,11 @@ const parcelSchema = z.object({
 	deliveryAddress: z.string().min(1, { message: "Delivery address is required" }),
 	pickupAddress: z.string().min(1, { message: "Pickup address is required" }),
 	deliveryDate: z
-		.date({ message: "Delivery date is required" }),
+		.string()
+		.min(1, { message: "Delivery date is required" })
+		.refine((v) => !Number.isNaN(Date.parse(v)), {
+			message: "Invalid date",
+		}),
 })
 
 type ParcelFormValues = z.infer<typeof parcelSchema>
@@ -45,34 +51,61 @@ export function calculateFee(weight: number): number {
 	return baseFee + weight * perKg;
 }
 
-export default function CreateParcel() {
+export default function UpdateParcel() {
+	const { trackingId } = useParams()
+	const { data: parcel, isLoading } = useGetParcelByIdQuery(trackingId)
+	const [updateParcel] = useUpdateParcelMutation()
+    const navigate = useNavigate()
 	const form = useForm<ParcelFormValues>({
 		resolver: zodResolver(parcelSchema) as any,
 		mode: "onBlur",
 	})
 
+	// Pre-populate form when parcel data is loaded
+	useEffect(() => {
+		if (parcel) {
+			form.reset({
+				type: parcel.type || "",
+				weight: parcel.weight || 0,
+				receiverPhoneNumber: parcel.receiverId.phone || "",
+				deliveryAddress: parcel.deliveryAddress || "",
+				pickupAddress: parcel.pickupAddress || "",
+				deliveryDate: parcel.deliveryDate ? format(new Date(parcel.deliveryDate), "yyyy-MM-dd") : "",
+			})
+		}
+	}, [parcel, form])
+
 	const weight = form.watch("weight");
 	const calculatedFee = weight && weight > 0 ? calculateFee(weight) : 0;
-
-    const [createParcel] = useCreateParcelMutation()
 
 	async function onSubmit(values: ParcelFormValues) {
 		try {
 			const payload = {
 				...values,
+				trackingId,
 				deliveryDate: new Date(values.deliveryDate).toISOString(),
 			}
-			const res = await createParcel(payload).unwrap()
-            console.log(res)
-            toast.success("Parcel created successfully")
+			const res = await updateParcel(payload).unwrap()
+			console.log(res)
+			toast.success("Parcel updated successfully")
+            navigate("/sender/all-parcel")
 		} catch (error) {
-			console.log(error)
-            toast.error("Failed to create parcel")
+			// Handle error
+			console.error("Failed to update parcel:", error)
 		}
+	}
+
+	if (isLoading) {
+		return <div>Loading...</div>
+	}
+
+	if (!parcel) {
+		return <div>Parcel not found</div>
 	}
 
 	return (
 		<div className="max-w-2xl w-full">
+			<h1 className="text-2xl font-bold mb-6">Update Parcel</h1>
 			<Form {...(form as any)}>
 				<form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
 					<FormField
@@ -162,49 +195,49 @@ export default function CreateParcel() {
 					/>
 
 					<FormField
-          control={form.control}
-          name="deliveryDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Delivery Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value? new Date(field.value) : undefined}
-                    onSelect={field.onChange}
-                    disabled={(date: Date) =>
-                      date < new Date() || date < new Date("1900-01-01")
-                    }
-                    captionLayout="dropdown"
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+						control={form.control as any}
+						name="deliveryDate"
+						render={({ field }) => (
+							<FormItem className="flex flex-col">
+								<FormLabel>Delivery Date</FormLabel>
+								<Popover>
+									<PopoverTrigger asChild>
+										<FormControl>
+											<Button
+												variant={"outline"}
+												className={cn(
+													"w-[240px] pl-3 text-left font-normal",
+													!field.value && "text-muted-foreground"
+												)}
+											>
+												{field.value ? (
+													format(new Date(field.value), "PPP")
+												) : (
+													<span>Pick a date</span>
+												)}
+												<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+											</Button>
+										</FormControl>
+									</PopoverTrigger>
+									<PopoverContent className="w-auto p-0" align="start">
+										<Calendar
+											mode="single"
+											selected={field.value ? new Date(field.value) : undefined}
+											onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+											disabled={(date) =>
+												date > new Date() || date < new Date("1900-01-01")
+											}
+											captionLayout="dropdown"
+										/>
+									</PopoverContent>
+								</Popover>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
 					<div className="pt-2">
-						<Button type="submit" className="w-full">Create Parcel</Button>
+						<Button type="submit" className="w-full">Update Parcel</Button>
 					</div>
 				</form>
 			</Form>
