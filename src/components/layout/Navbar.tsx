@@ -18,8 +18,8 @@ import { useAppDispatch } from "@/redux/hooks"
 // Navigation links array to be used in both desktop and mobile menus
 const navigationLinks = [
   { href: "/", label: "Home"},
-  { href: "#", label: "About" },
-  { href: "#", label: "Contact" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ]
 
 

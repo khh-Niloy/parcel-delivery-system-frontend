@@ -13,7 +13,9 @@ import DeliveryAgentRegisterPage from "@/pages/auth/DeliveryAgentRegisterPage";
 import { deliveryAgentRoutes } from "./deliveryAgentRoutes";
 import UnauthorizedPage from "@/pages/Unauthorized";
 import { receiverRoutes } from "./receiverRoutes";
-
+import AboutPage from "@/pages/AboutPage";
+import ContactPage from "@/pages/ContactPage";
+  
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -22,6 +24,14 @@ export const router = createBrowserRouter([
       {
         index: true,
         Component: HomePage
+      },
+      {
+        path: "/about",
+        Component: AboutPage
+      },
+      {
+        path: "/contact",
+        Component: ContactPage
       }
     ]
   },
