@@ -1,18 +1,20 @@
-import { useAllSenderParcelQuery } from "@/redux/features/parcel/parcel.api"
+import { useAllSenderParcelQuery, useUpdateParcelStatusMutation } from "@/redux/features/parcel/parcel.api"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from "react-router"
 import { useState } from "react"
 import { ChevronDown, ChevronRight } from "lucide-react"
+import { toast } from "sonner"
+import { TableLoadingSkeleton } from "@/components/ui/loading"
 
 export default function SenderAllParcel() {
 
-    const { data, isLoading, isError } = useAllSenderParcelQuery(undefined)
+    const { data, isLoading, isError, refetch } = useAllSenderParcelQuery(undefined)
     const parcels: any[] = Array.isArray(data) ? data : Array.isArray((data as any)?.data) ? (data as any).data : []
 
     const [openDetailsIds, setOpenDetailsIds] = useState<Set<string>>(new Set())
+    const [cancellingParcel, setCancellingParcel] = useState<string | null>(null)
 
     const toggleDetailsFor = (id?: string) => {
         if (!id) return
@@ -27,8 +29,33 @@ export default function SenderAllParcel() {
         })
     }
 
+    const [updateParcelStatus] = useUpdateParcelStatusMutation()
+
+    const handleCancel = async (trackingId: string) => {
+        try {
+            setCancellingParcel(trackingId)
+            console.log(trackingId)
+        const res = await updateParcelStatus({
+            trackingId,
+            updatedBy: "SENDER",
+            status: "CANCELLED",
+        }).unwrap()
+        console.log(res)
+        if(res.success){
+            toast.success("Parcel cancelled successfully")
+            // Refetch data to update the table
+            refetch()
+        }
+        } catch (error: any) {
+            toast.error(error?.data?.message || "Failed to cancel parcel")
+            console.log(error)
+        } finally {
+            setCancellingParcel(null)
+        }
+    }
+
     if (isLoading) {
-        return <div>Loading...</div>
+        return <TableLoadingSkeleton rows={8} />
     }
 
     if (isError) {
@@ -172,11 +199,14 @@ export default function SenderAllParcel() {
                                                 Update
                                             </Link>
                                             </Button>
-                                            <Button variant="destructive" size="sm" disabled={!canCancel}>
-                                            <Link to={`/sender/delete-parcel/${p?.trackingId}`}>
-                                            Cancel
-                                            </Link>
-                                            </Button>
+                                                                        <Button 
+                                onClick={() => handleCancel(p?.trackingId)} 
+                                variant="destructive" 
+                                size="sm" 
+                                disabled={!canCancel || cancellingParcel === p?.trackingId}
+                            >
+                                {cancellingParcel === p?.trackingId ? "Cancelling..." : "Cancel"}
+                            </Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>

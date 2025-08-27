@@ -23,7 +23,7 @@ import { Home, ArrowLeft } from "lucide-react"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
-  const {data: user, isLoading} = useUserInfoQuery(undefined)
+  const {data: user} = useUserInfoQuery(undefined)
   const location = useLocation()
 
 console.log(user?.data?.role)
@@ -73,7 +73,6 @@ const data = {
                   <SidebarMenuItem key={subItem.title}>
                     <SidebarMenuButton asChild isActive={location.pathname.startsWith(subItem.url)}>
                       <Link to={subItem.url} className="flex items-center gap-2">
-                        {subItem.icon}
                         <span>{subItem.title}</span>
                       </Link>
                     </SidebarMenuButton>

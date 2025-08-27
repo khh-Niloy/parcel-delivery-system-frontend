@@ -31,7 +31,7 @@ export default function ContactPage() {
     },
   })
 
-  const handleSubmit = async (values: ContactFormValues) => {
+  const handleSubmit = async () => {
     setIsSubmitting(true)
     await new Promise((r) => setTimeout(r, 800))
     toast.success("Your inquiry was submitted. We'll get back to you soon.")
@@ -71,11 +71,11 @@ export default function ContactPage() {
               </div>
               <div>
                 <p className="font-medium text-gray-900">Phone</p>
-                <p>+1 (555) 123‑4567</p>
+                <p>01915910291</p>
               </div>
               <div>
                 <p className="font-medium text-gray-900">Hours</p>
-                <p>Mon–Fri, 9:00–18:00</p>
+                <p>Mon–Fri, 9:00 am to 6:00 pm</p>
               </div>
             </CardContent>
           </Card>

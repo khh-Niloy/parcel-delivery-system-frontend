@@ -25,6 +25,7 @@ import { useCreateParcelMutation } from "@/redux/features/parcel/parcel.api"
 import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { useNavigate } from "react-router"
 
 const parcelSchema = z.object({
 	type: z.string().min(1, { message: "Type is required" }),
@@ -48,6 +49,7 @@ export function calculateFee(weight: number): number {
 }
 
 export default function CreateParcel() {
+	const navigate = useNavigate()
 	const form = useForm<ParcelFormValues>({
 		resolver: zodResolver(parcelSchema) as any,
 		mode: "onBlur",
@@ -67,9 +69,11 @@ export default function CreateParcel() {
 			const res = await createParcel(payload).unwrap()
             console.log(res)
             toast.success("Parcel created successfully")
-		} catch (error) {
+			form.reset()
+			navigate("/sender/all-parcel")
+		} catch (error: any) {
 			console.log(error)
-            toast.error("Failed to create parcel")
+            toast.error(error?.data?.message || "Failed to create parcel. Please try again.")
 		}
 	}
 

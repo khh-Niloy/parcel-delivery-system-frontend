@@ -29,7 +29,7 @@ export const StatusFlow: Record<string, { next: string[]; allowedRoles: string[]
     },
     CANCELLED: {
         next: [],
-        allowedRoles: [],
+        allowedRoles: ["ADMIN", "SENDER"],
     },
     BLOCKED: {
         next: [],

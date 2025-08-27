@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { toast } from "sonner"
+import { FormLoadingSkeleton } from "@/components/ui/loading"
 
 const parcelSchema = z.object({
 	type: z.string().min(1, { message: "Type is required" }),
@@ -89,14 +90,14 @@ export default function UpdateParcel() {
 			console.log(res)
 			toast.success("Parcel updated successfully")
             navigate("/sender/all-parcel")
-		} catch (error) {
-			// Handle error
+		} catch (error: any) {
+			toast.error(error?.data?.message || "Failed to update parcel. Please try again.")
 			console.error("Failed to update parcel:", error)
 		}
 	}
 
 	if (isLoading) {
-		return <div>Loading...</div>
+		return <FormLoadingSkeleton />
 	}
 
 	if (!parcel) {

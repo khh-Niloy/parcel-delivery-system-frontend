@@ -1,7 +1,7 @@
 import { LoginForm } from '@/components/modules/auth/LoginForm'
 import { Button } from '@/components/ui/button'
 import { Link } from 'react-router'
-import { ArrowLeft, Home } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 
 export default function LoginPage() {
   return (

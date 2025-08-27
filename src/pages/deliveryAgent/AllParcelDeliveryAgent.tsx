@@ -1,19 +1,18 @@
 import { useAllParcelsAdminQuery, useUpdateParcelStatusMutation } from "@/redux/features/parcel/parcel.api"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { format } from "date-fns"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusFlow } from "@/contant/StatusFlow"
 import { useUserInfoQuery } from "@/redux/features/auth/auth.api"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { ChevronDown, ChevronRight } from "lucide-react"
+import { TableLoadingSkeleton } from "@/components/ui/loading"
 
 export default function AllParcelDeliveryAgent() {
 
     // NOTE: Using admin list for now; ideally there should be an endpoint for agent-assigned parcels
-    const { data, isLoading, isError } = useAllParcelsAdminQuery(undefined)
+    const { data, isLoading, isError, refetch } = useAllParcelsAdminQuery(undefined)
     const { data: meData } = useUserInfoQuery(undefined)
 
     const allowedParcels = data?.filter((e: any) => e.status.includes("IN_TRANSIT") ||  
@@ -23,6 +22,7 @@ export default function AllParcelDeliveryAgent() {
     const [updateParcel, { isLoading: isUpdating }] = useUpdateParcelStatusMutation()
     const [openDetailsIds, setOpenDetailsIds] = useState<Set<string>>(new Set())
     const [notes, setNotes] = useState<{ [key: string]: string }>({})
+    const [updatingParcel, setUpdatingParcel] = useState<string | null>(null)
 
     const toggleDetailsFor = (id?: string) => {
         if (!id) return
@@ -38,7 +38,7 @@ export default function AllParcelDeliveryAgent() {
     }
 
     if (isLoading) {
-        return <div>Loading...</div>
+        return <TableLoadingSkeleton rows={8} />
     }
 
     if (isError) {
@@ -77,6 +77,7 @@ export default function AllParcelDeliveryAgent() {
 
                         const handleChangeStatus = async (nextStatus: string) => {
                             try {
+                                setUpdatingParcel(p?.trackingId)
                                 const note = notes[p?.trackingId] || ""
                                 const payload = {
                                     trackingId: p?.trackingId,
@@ -87,15 +88,19 @@ export default function AllParcelDeliveryAgent() {
                                 const res = await updateParcel(payload).unwrap()
                                 if (res?.success) {
                                     toast.success("Status updated successfully")
+                                    // Refetch data to update the table
+                                    refetch()
                                 }
                                 setNotes(prev => {
                                     const newNotes = { ...prev }
                                     delete newNotes[p?.trackingId]
                                     return newNotes
                                 })
-                            } catch (error) {
+                            } catch (error: any) {
+                                toast.error(error?.data?.message || "Failed to update status")
                                 console.error(error)
-                                toast.error("Failed to update status")
+                            } finally {
+                                setUpdatingParcel(null)
                             }
                         }
 
@@ -211,9 +216,11 @@ export default function AllParcelDeliveryAgent() {
                                                     className="border rounded-md px-3 py-1.5 text-sm bg-background ring-1 ring-border focus:ring-2 focus:ring-ring transition-shadow"
                                                     value={currentStatus}
                                                     onChange={(e) => handleChangeStatus(e.target.value)}
-                                                    disabled={isUpdating || nextStatuses.length === 0 || !canChangeThisStatus}
+                                                    disabled={isUpdating || updatingParcel === p?.trackingId || nextStatuses.length === 0 || !canChangeThisStatus}
                                                 >
-                                                    <option value={currentStatus}>{currentStatus}</option>
+                                                    <option value={currentStatus}>
+                                                        {updatingParcel === p?.trackingId ? "Updating..." : currentStatus}
+                                                    </option>
                                                     {nextStatuses.map((ns) => (
                                                         <option key={ns} value={ns}>{ns}</option>
                                                     ))}
@@ -229,7 +236,7 @@ export default function AllParcelDeliveryAgent() {
                                                         [p?.trackingId]: e.target.value
                                                     }))}
                                                     className="w-40 text-sm"
-                                                    disabled={isUpdating || nextStatuses.length === 0 || !canChangeThisStatus}
+                                                    disabled={isUpdating || updatingParcel === p?.trackingId || nextStatuses.length === 0 || !canChangeThisStatus}
                                                 />
                                             </div>
                                         </div>

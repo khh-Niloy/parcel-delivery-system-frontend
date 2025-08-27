@@ -89,9 +89,9 @@ export function DeliveryAgentRegForm({
         navigate("/login")
         form.reset()
       }
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Registration failed. Please try again.")
       console.log(error)
-      toast.error("Registration failed. Please try again.")
     }
   }
   

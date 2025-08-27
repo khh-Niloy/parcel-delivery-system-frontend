@@ -1,18 +1,17 @@
 import { useAllParcelsAdminQuery, useAssignDeliveryAgentMutation, useUpdateParcelStatusMutation } from "@/redux/features/parcel/parcel.api"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { format } from "date-fns"
-import { Button } from "@/components/ui/button"
 import { ChevronDown, ChevronRight } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusFlow } from "@/contant/StatusFlow"
 import { useUserInfoQuery } from "@/redux/features/auth/auth.api"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
+import { TableLoadingSkeleton } from "@/components/ui/loading"
 
 export default function AllParcelsAdmin() {
 
-    const { data, isLoading, isError } = useAllParcelsAdminQuery(undefined)
+    const { data, isLoading, isError, refetch } = useAllParcelsAdminQuery(undefined)
     const { data: meData } = useUserInfoQuery(undefined)
     const parcels: any[] = Array.isArray(data) ? data : []
     const [updateParcel, { isLoading: isUpdating }] = useUpdateParcelStatusMutation()
@@ -20,6 +19,7 @@ export default function AllParcelsAdmin() {
 
     const [openDetailsIds, setOpenDetailsIds] = useState<Set<string>>(new Set())
     const [notes, setNotes] = useState<{ [key: string]: string }>({})
+    const [updatingParcel, setUpdatingParcel] = useState<string | null>(null)
 
     const toggleDetailsFor = (id?: string) => {
         if (!id) return
@@ -35,7 +35,7 @@ export default function AllParcelsAdmin() {
     }
 
     if (isLoading) {
-        return <div>Loading...</div>
+        return <TableLoadingSkeleton rows={10} />
     }
 
     if (isError) {
@@ -45,10 +45,6 @@ export default function AllParcelsAdmin() {
     if (!parcels.length) {
         return <div>No parcels found.</div>
     }
-
-    console.log(parcels)
-
-    
 
     return (
         <div className="w-full">
@@ -76,15 +72,17 @@ export default function AllParcelsAdmin() {
 
                         const handleChangeStatus = async (nextStatus: string) => {
                             try {
+                                setUpdatingParcel(p?.trackingId)
 
                                 if(nextStatus === "DISPATCHED"){
                                     const payload = {
                                         trackingId: p?.trackingId,
                                     }
                                     const res = await assignDeliveryAgent(payload).unwrap()
-                                    console.log(res)
                                     if (res?.success) {
                                         toast.success("Delivery agent assigned successfully")
+                                        // Refetch data to update the table
+                                        refetch()
                                     }
                                     return
                                 }
@@ -96,9 +94,7 @@ export default function AllParcelsAdmin() {
                                     note: note,
                                     updatedBy: meData?.data?.role
                                 }
-                                console.log(payload)
-                                const res = await updateParcel(payload).unwrap()
-                                console.log(res)
+                                await updateParcel(payload).unwrap()
                                 // Clear the note after successful update
                                 setNotes(prev => {
                                     const newNotes = { ...prev }
@@ -106,8 +102,13 @@ export default function AllParcelsAdmin() {
                                     return newNotes
                                 })
                                 toast.success("Status updated successfully")
-                            } catch (error) {
+                                // Refetch data to update the table
+                                refetch()
+                            } catch (error: any) {
+                                toast.error(error?.data?.message || "Failed to update parcel status")
                                 console.error(error)
+                            } finally {
+                                setUpdatingParcel(null)
                             }
                         }
 
@@ -223,9 +224,11 @@ export default function AllParcelsAdmin() {
                                                     className="border rounded-md px-3 py-1.5 text-sm bg-background ring-1 ring-border focus:ring-2 focus:ring-ring transition-shadow"
                                                     value={currentStatus}
                                                     onChange={(e) => handleChangeStatus(e.target.value)}
-                                                    disabled={isUpdating || nextStatuses.length === 0 || !canChangeThisStatus}
+                                                    disabled={isUpdating || updatingParcel === p?.trackingId || nextStatuses.length === 0 || !canChangeThisStatus}
                                                 >
-                                                    <option value={currentStatus}>{currentStatus}</option>
+                                                    <option value={currentStatus}>
+                                                        {updatingParcel === p?.trackingId ? "Updating..." : currentStatus}
+                                                    </option>
                                                     {nextStatuses.map((ns) => (
                                                         <option key={ns} value={ns}>{ns}</option>
                                                     ))}
@@ -241,7 +244,7 @@ export default function AllParcelsAdmin() {
                                                         [p?.trackingId]: e.target.value
                                                     }))}
                                                     className="w-40 text-sm"
-                                                    disabled={isUpdating || nextStatuses.length === 0 || !canChangeThisStatus}
+                                                    disabled={isUpdating || updatingParcel === p?.trackingId || nextStatuses.length === 0 || !canChangeThisStatus}
                                                 />
                                             </div>
                                         </div>

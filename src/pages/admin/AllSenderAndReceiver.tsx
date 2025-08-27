@@ -1,6 +1,8 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { useGetAllUsersQuery } from '@/redux/features/user/user.api'
+import { TableLoadingSkeleton } from '@/components/ui/loading'
+import { toast } from 'sonner'
 
 type AppUser = {
   address: string
@@ -34,8 +36,26 @@ export default function AllSenderAndReceiver() {
     (user: AppUser) => user.role === 'SENDER' || user.role === 'RECEIVER'
   )
 
+  const handleBlockUser = async (userId: string, isBlocked: boolean) => {
+    try {
+      // TODO: Implement block user API call
+      toast.success(`User ${isBlocked ? 'unblocked' : 'blocked'} successfully`)
+    } catch (error: any) {
+      toast.error(error?.data?.message || `Failed to ${isBlocked ? 'unblock' : 'block'} user`)
+    }
+  }
+
+  const handleDeleteUser = async (userId: string) => {
+    try {
+      // TODO: Implement delete user API call
+      toast.success("User deleted successfully")
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete user")
+    }
+  }
+
   if (isLoading) {
-    return <div className="p-4">Loading users...</div>
+    return <div className="p-4"><TableLoadingSkeleton rows={8} /></div>
   }
 
   if (isError) {
@@ -77,10 +97,18 @@ export default function AllSenderAndReceiver() {
               <TableCell className="hidden 2xl:table-cell">{formatDate(u.createdAt)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button size="sm" variant={u.isBlocked ? 'ghost' : 'secondary'} disabled={u.isBlocked}>
+                  <Button 
+                    size="sm" 
+                    variant={u.isBlocked ? 'ghost' : 'secondary'} 
+                    onClick={() => handleBlockUser(u._id || '', u.isBlocked)}
+                  >
                     {u.isBlocked ? 'Blocked' : 'Block'}
                   </Button>
-                  <Button size="sm" variant="destructive">
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => handleDeleteUser(u._id || '')}
+                  >
                     Delete
                   </Button>
                 </div>

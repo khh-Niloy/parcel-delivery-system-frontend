@@ -74,12 +74,13 @@ export function RegisterForm({
       console.log(data)
     const res = await register(data).unwrap()
     console.log(res)
-    if(res.data.success){
+    if(res.success){
       toast.success("Registration successful")
       navigate("/login")
       form.reset()
     }
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Registration failed. Please try again.")
       console.log(error)
     }
   }
