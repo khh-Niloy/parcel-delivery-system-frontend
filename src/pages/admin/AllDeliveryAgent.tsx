@@ -43,7 +43,7 @@ export default function AllDeliveryAgent() {
     (user: DeliveryAgent) => user.role === "DELIVERY_AGENT"
   )
 
-  const handleBlockAgent = async (agentId: string, isBlocked: boolean) => {
+  const handleBlockAgent = async (_agentId: string, isBlocked: boolean) => {
     try {
       // TODO: Implement block agent API call
       toast.success(`Delivery agent ${isBlocked ? 'unblocked' : 'blocked'} successfully`)
@@ -52,7 +52,7 @@ export default function AllDeliveryAgent() {
     }
   }
 
-  const handleDeleteAgent = async (agentId: string) => {
+  const handleDeleteAgent = async (_agentId: string) => {
     try {
       // TODO: Implement delete agent API call
       toast.success("Delivery agent deleted successfully")

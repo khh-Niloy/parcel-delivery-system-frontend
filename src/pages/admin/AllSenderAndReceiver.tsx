@@ -36,7 +36,7 @@ export default function AllSenderAndReceiver() {
     (user: AppUser) => user.role === 'SENDER' || user.role === 'RECEIVER'
   )
 
-  const handleBlockUser = async (userId: string, isBlocked: boolean) => {
+  const handleBlockUser = async (_userId: string, isBlocked: boolean) => {
     try {
       // TODO: Implement block user API call
       toast.success(`User ${isBlocked ? 'unblocked' : 'blocked'} successfully`)
@@ -45,7 +45,7 @@ export default function AllSenderAndReceiver() {
     }
   }
 
-  const handleDeleteUser = async (userId: string) => {
+  const handleDeleteUser = async (_userId: string) => {
     try {
       // TODO: Implement delete user API call
       toast.success("User deleted successfully")
