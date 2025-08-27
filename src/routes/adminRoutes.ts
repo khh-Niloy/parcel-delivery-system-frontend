@@ -1,14 +1,20 @@
+import AllDeliveryAgent from "@/pages/admin/AllDeliveryAgent";
 import AllParcelsAdmin from "@/pages/admin/AllParcelsAdmin";
-import AllUser from "@/pages/admin/AllUser";
+import AllSenderAndReceiver from "@/pages/admin/AllSenderAndReceiver";
 
 export const adminRoutes = [
   {
     title: "User and Parcel Management",
     items: [
       {
-        title: "All User",
+        title: "All Sender and Receiver",
         url: "/admin/all-user",
-        component: AllUser,
+        component: AllSenderAndReceiver,
+      },
+      {
+        title: "All Delivery Agent",
+        url: "/admin/all-delivery-agent",
+        component: AllDeliveryAgent,
       },
       {
         title: "All Parcel",

@@ -7,6 +7,9 @@ export const userApi = baseApi.injectEndpoints({
                 url: "/user/all-user",
                 method: "GET",
             }),
+            transformResponse: (response: any)=> {
+                return response.data
+            }
         }),
         
     })
