@@ -60,17 +60,22 @@ export function LoginForm({
   }
   
   return (
-    <div className={cn("flex flex-col gap-6 w-full max-w-md mx-auto justify-center items-center min-h-screen", className)} {...props}>
+    <div className={cn("w-full", className)} {...props}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="text-sm font-medium text-gray-700">Email Address</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter your email" type="email" {...field} />
+                  <Input 
+                    placeholder="Enter your email" 
+                    type="email" 
+                    className="h-12 px-4 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -81,12 +86,13 @@ export function LoginForm({
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel className="text-sm font-medium text-gray-700">Password</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input 
                       placeholder="Enter your password" 
                       type={showPassword ? "text" : "password"} 
+                      className="h-12 px-4 pr-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
                       {...field} 
                     />
                     <Button
@@ -108,18 +114,19 @@ export function LoginForm({
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">Login</Button>
+          <Button type="submit" className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg">
+            Sign In
+          </Button>
         </form>
       </Form>
-      <div className="text-center text-sm">
-        Don't have an account?{" "}
-        <a href="/register" className="text-primary hover:underline">
-          Register here
-        </a>
-      </div>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="/terms">Terms of Service</a>{" "}
-        and <a href="/privacy">Privacy Policy</a>.
+      
+      {/* Additional Info */}
+      <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="text-center text-xs text-gray-500">
+          By signing in, you agree to our{" "}
+          <a href="/terms" className="text-blue-600 hover:underline">Terms of Service</a>{" "}
+          and <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.
+        </div>
       </div>
     </div>
   )

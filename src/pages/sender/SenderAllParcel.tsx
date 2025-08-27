@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Link } from "react-router"
 import { useState } from "react"
+import { ChevronDown, ChevronRight } from "lucide-react"
 
 export default function SenderAllParcel() {
 
@@ -61,26 +62,47 @@ export default function SenderAllParcel() {
                         
                         return (
                             <>
-                                <TableRow key={p?.trackingId ?? p?._id}>
-                                    <TableCell className="font-medium">{p?.trackingId}</TableCell>
-                                    <TableCell>
-                                        <div className="space-y-1">
-                                            <div><strong>Type:</strong> {p?.type}</div>
-                                            <div><strong>Weight:</strong> {p?.weight} kg</div>
-                                            <div><strong>Fee:</strong> ৳{p?.fee}</div>
+                                <TableRow key={(p?.trackingId ?? p?._id) + "-main"}>
+                                    <TableCell className="font-medium">
+                                        <div className="flex flex-col gap-1">
+                                            <span>{p?.trackingId}</span>
+                                            {hasTrackingEvents && (
+                                                <button
+                                                    type="button"
+                                                    className="text-xs text-primary inline-flex items-center gap-1 w-fit"
+                                                    onClick={() => toggleDetailsFor(p?.trackingId)}
+                                                >
+                                                    {openDetailsIds.has(p?.trackingId) ? (
+                                                        <>
+                                                            <span>Hide tracking events</span>
+                                                            <ChevronDown className="h-3.5 w-3.5" />
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span>See tracking events</span>
+                                                            <ChevronRight className="h-3.5 w-3.5" />
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="space-y-1 max-w-xs">
+                                        <div className="space-y-1">
+                                            <div className="text-sm"><strong>Type:</strong> {p?.type} • <strong>Weight:</strong> {p?.weight} kg • <strong>Fee:</strong> ৳{p?.fee}</div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="space-y-1">
                                             <div>
                                                 <strong>From:</strong> 
-                                                <span className="text-sm text-muted-foreground block truncate" title={p?.pickupAddress}>
+                                                <span className="text-sm text-muted-foreground block whitespace-pre-wrap break-words" title={p?.pickupAddress}>
                                                     {p?.pickupAddress}
                                                 </span>
                                             </div>
                                             <div>
                                                 <strong>To:</strong> 
-                                                <span className="text-sm text-muted-foreground block truncate" title={p?.deliveryAddress}>
+                                                <span className="text-sm text-muted-foreground block whitespace-pre-wrap break-words" title={p?.deliveryAddress}>
                                                     {p?.deliveryAddress}
                                                 </span>
                                             </div>
@@ -89,14 +111,45 @@ export default function SenderAllParcel() {
                                     <TableCell>
                                         <div className="space-y-1">
                                             <div>
-                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                    p?.status === 'REQUESTED' ? 'bg-yellow-100 text-yellow-800' :
-                                                    p?.status === 'APPROVED' ? 'bg-blue-100 text-blue-800' :
-                                                    p?.status === 'IN_TRANSIT' ? 'bg-purple-100 text-purple-800' :
-                                                    p?.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                                                    p?.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                                                    'bg-gray-100 text-gray-800'
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full ring-1 ring-inset ${
+                                                    p?.status === 'REQUESTED' ? 'bg-amber-50 text-amber-700 ring-amber-200/50' :
+                                                    p?.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 ring-emerald-200/50' :
+                                                    p?.status === 'DISPATCHED' ? 'bg-purple-50 text-purple-700 ring-purple-200/50' :
+                                                    p?.status === 'IN_TRANSIT' ? 'bg-blue-50 text-blue-700 ring-blue-200/50' :
+                                                    p?.status === 'DELIVERED' ? 'bg-green-50 text-green-700 ring-green-200/50' :
+                                                    p?.status === 'CONFIRMED' ? 'bg-emerald-50 text-emerald-700 ring-emerald-200/50' :
+                                                    p?.status === 'RETURNED' ? 'bg-orange-50 text-orange-700 ring-orange-200/50' :
+                                                    p?.status === 'BLOCKED' ? 'bg-red-50 text-red-700 ring-red-200/50' :
+                                                    p?.status === 'CANCELLED' ? 'bg-red-50 text-red-700 ring-red-200/50' :
+                                                    'bg-gray-50 text-gray-700 ring-gray-200/50'
                                                 }`}>
+                                                    {p?.status === 'REQUESTED' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                                                    )}
+                                                    {p?.status === 'APPROVED' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                    )}
+                                                    {p?.status === 'DISPATCHED' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-purple-500" />
+                                                    )}
+                                                    {p?.status === 'IN_TRANSIT' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                                                    )}
+                                                    {p?.status === 'DELIVERED' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                                                    )}
+                                                    {p?.status === 'CONFIRMED' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                                    )}
+                                                    {p?.status === 'RETURNED' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                                                    )}
+                                                    {p?.status === 'BLOCKED' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                                                    )}
+                                                    {p?.status === 'CANCELLED' && (
+                                                        <div className="h-1.5 w-1.5 rounded-full bg-red-500" />
+                                                    )}
                                                     {p?.status}
                                                 </span>
                                             </div>
@@ -125,43 +178,43 @@ export default function SenderAllParcel() {
                                         </div>
                                     </TableCell>
                                 </TableRow>
-                                {hasTrackingEvents && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="p-0">
-                                            <Card className="m-4">
-                                                <CardHeader>
-                                                    <CardTitle className="text-lg">Tracking Events</CardTitle>
-                                                    <Button onClick={() => toggleDetailsFor(p?.trackingId)}>
-                                                        {openDetailsIds.has(p?.trackingId) ? "Hide Details" : "See Details"}
-                                                    </Button>
-                                                </CardHeader>
-                                                {openDetailsIds.has(p?.trackingId) && (
-                                                    <CardContent>
-                                                        <div className="space-y-4">
-                                                            {p.trackingEvents.map((event: any, index: number) => (
-                                                                <div key={index} className="border-l-4 border-primary pl-4 py-2">
-                                                                    <div className="flex justify-between items-start">
-                                                                        <div>
-                                                                            <h4 className="font-semibold text-primary">{event.status}</h4>
-                                                                            <p className="text-sm text-muted-foreground mt-1">{event.note}</p>
-                                                                            <p className="text-sm text-muted-foreground mt-1">
-                                                                                <strong>Location:</strong> {event.location}
-                                                                            </p>
-                                                                            <p className="text-sm text-muted-foreground">
-                                                                                <strong>Updated by:</strong> {event.updatedBy}
-                                                                            </p>
-                                                                        </div>
-                                                                        <div className="text-right text-sm text-muted-foreground">
-                                                                            <p>{format(new Date(event.timestamp), "PPp")}</p>
-                                                                            <p className="text-xs">Created: {format(new Date(event.createdAt), "PPp")}</p>
-                                                                        </div>
+                                {hasTrackingEvents && openDetailsIds.has(p?.trackingId) && (
+                                    <TableRow key={(p?.trackingId ?? p?._id) + "-details"}>
+                                        <TableCell colSpan={5} className="bg-muted/30 p-4">
+                                            <div className="space-y-4">
+                                                <div className="text-sm font-semibold">Tracking Events</div>
+                                                <div className="space-y-4">
+                                                    {p.trackingEvents.map((event: any, index: number) => {
+                                                        const isLast = index === p.trackingEvents.length - 1
+                                                        return (
+                                                            <div key={index} className="relative pl-6">
+                                                                <span className="absolute left-0 top-2 h-2 w-2 rounded-full bg-primary" />
+                                                                {!isLast && (
+                                                                    <span className="absolute left-[3px] top-4 h-[calc(100%-1rem)] w-px bg-border" />
+                                                                )}
+                                                                <div className="flex items-start justify-between gap-4">
+                                                                    <div className="min-w-0">
+                                                                        <div className="font-medium text-primary">{event.status}</div>
+                                                                        {event.note && (
+                                                                            <p className="text-sm text-muted-foreground mt-1 break-words">{event.note}</p>
+                                                                        )}
+                                                                        {event.location && (
+                                                                            <p className="text-xs text-muted-foreground mt-1"><strong>Location:</strong> {event.location}</p>
+                                                                        )}
+                                                                        {event.updatedBy && (
+                                                                            <p className="text-xs text-muted-foreground"><strong>Updated by:</strong> {event.updatedBy}</p>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="text-right text-xs text-muted-foreground shrink-0">
+                                                                        {event.timestamp && <p>{format(new Date(event.timestamp), "PPp")}</p>}
+                                                                        {event.createdAt && <p className="opacity-80">Created: {format(new Date(event.createdAt), "PPp")}</p>}
                                                                     </div>
                                                                 </div>
-                                                            ))}
-                                                        </div>
-                                                    </CardContent>
-                                                )}
-                                            </Card>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 )}

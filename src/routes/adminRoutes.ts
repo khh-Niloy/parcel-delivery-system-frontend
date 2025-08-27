@@ -3,7 +3,7 @@ import AllUser from "@/pages/admin/AllUser";
 
 export const adminRoutes = [
   {
-    title: "None",
+    title: "User and Parcel Management",
     items: [
       {
         title: "All User",

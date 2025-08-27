@@ -24,7 +24,7 @@ const navigationLinks = [
 
 
 export default function Navbar() {
-  const {data: user, isLoading} = useUserInfoQuery(undefined)
+  const {data: user} = useUserInfoQuery(undefined)
   console.log(user?.data.role)
 
   let role = user?.data.role
@@ -33,7 +33,7 @@ export default function Navbar() {
     role = "delivery-agent"
   }
 
-  const [logout, {isLoading: isLogoutLoading}] = useUserLogoutMutation()
+  const [logout] = useUserLogoutMutation()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
@@ -44,15 +44,13 @@ export default function Navbar() {
   }
 
   return (
-    <header className="border-b px-4 md:px-6">
+    <header className="sticky top-0 z-50 border-b bg-white px-4 md:px-6">
       <div className="flex h-16 justify-between gap-4">
-        {/* Left side */}
         <div className="flex gap-2">
           <div className="flex items-center md:hidden">
-            {/* Mobile menu trigger */}
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="group size-8" variant="ghost" size="icon">
+                <Button className="group size-8 hover:text-primary" variant="ghost" size="icon">
                   <svg
                     className="pointer-events-none"
                     width={16}
@@ -80,14 +78,14 @@ export default function Navbar() {
                   </svg>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-36 p-1 md:hidden">
+              <PopoverContent align="start" className="w-40 p-1 md:hidden">
                 <NavigationMenu className="max-w-none *:w-full">
                   <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
                     {navigationLinks.map((link, index) => (
                       <NavigationMenuItem key={index} className="w-full">
                         <NavigationMenuLink
                           href={link.href}
-                          className="py-1.5"
+                          className="py-2 px-2 rounded-md hover:bg-accent hover:text-primary transition-colors"
                         >
                           {link.label}
                         </NavigationMenuLink>
@@ -98,19 +96,18 @@ export default function Navbar() {
               </PopoverContent>
             </Popover>
           </div>
-          {/* Main nav */}
           <div className="flex items-center gap-6">
-            <a href="/" className="text-primary hover:text-primary/90">
+            <a href="/" className="group inline-flex items-center">
               <Logo />
+              <span className="sr-only">Parcel Delivery</span>
             </a>
-            {/* Navigation menu */}
             <NavigationMenu className="h-full *:h-full max-md:hidden">
               <NavigationMenuList className="h-full gap-2">
                 {navigationLinks.map((link, index) => (
                   <NavigationMenuItem key={index} className="h-full">
                     <NavigationMenuLink
                       href={link.href}
-                      className="text-muted-foreground hover:text-primary border-b-primary hover:border-b-primary data-[active]:border-b-primary h-full justify-center rounded-none border-y-2 border-transparent py-1.5 font-medium hover:bg-transparent data-[active]:bg-transparent!"
+                      className="text-muted-foreground hover:text-primary border-b-primary hover:border-b-primary data-[active]:border-b-primary h-full justify-center rounded-none border-y-2 border-transparent py-1.5 px-2 font-medium hover:bg-transparent data-[active]:bg-transparent! transition-colors"
                     >
                       {link.label}
                     </NavigationMenuLink>
@@ -120,24 +117,21 @@ export default function Navbar() {
             </NavigationMenu>
           </div>
         </div>
-        {/* Right side */}
         <div className="flex items-center gap-2">
           <div>
             {
               user ? <div>
-                {/* <Button  variant="ghost" size="sm" className="text-sm gap-7">
-                  <Link to="/profile">Profile</Link>
-                </Button> */}
+                
                 <Button onClick={handleLogout} variant="destructive" size="sm" className="text-sm gap-7">
                   Logout
                 </Button>
               </div> :
               <>
               <div className="flex gap-2">
-                <Button  variant="ghost" size="sm" className="text-sm gap-7">
+                <Button  variant="ghost" size="sm" className="text-sm gap-7 text-primary hover:bg-accent">
                   <Link to="/login">Login</Link>
                 </Button>
-                <Button  variant="ghost" size="sm" className="text-sm gap-7">
+                <Button  variant="ghost" size="sm" className="text-sm gap-7 text-primary hover:bg-accent">
                   <Link to="/register">Register</Link>
                 </Button>
               </div>
@@ -145,9 +139,11 @@ export default function Navbar() {
             }
             
           </div>
-          <Button asChild size="sm" className="text-sm">
-            <Link to={`/${role?.toLowerCase()}`}>Dashboard</Link>
-          </Button>
+          {
+            user && <Button asChild size="sm" className="text-sm">
+              <Link to={`/${role?.toLowerCase()}`}>Dashboard</Link>
+            </Button>
+          }
         </div>
       </div>
     </header>

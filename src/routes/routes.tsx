@@ -88,7 +88,7 @@ export const router = createBrowserRouter([
     Component: LoginPage,
   },
   {
-    path: "/delivery-partner/register",
+    path: "/delivery-agent-register",
     Component: DeliveryAgentRegisterPage,
   },
   {

@@ -2,7 +2,7 @@ import Logo from "@/assets/icons/Logo";
 
 export default function Footer() {
   return (
-    <footer className="bg-white">
+    <footer className="bg-white border-t">
   <div className="mx-auto space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <div>
@@ -10,9 +10,8 @@ export default function Footer() {
           <Logo/>
         </div>
 
-        <p className="mt-4 max-w-xs text-gray-500">
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Esse non cupiditate quae nam
-          molestias.
+        <p className="mt-4 max-w-sm text-muted-foreground">
+          Fast, reliable parcel delivery for modern businesses and busy people. Track, manage, and deliver with confidence.
         </p>
 
         <ul className="mt-8 flex gap-6">
@@ -21,7 +20,7 @@ export default function Footer() {
               href="#"
               rel="noreferrer"
               target="_blank"
-              className="text-gray-700 transition hover:opacity-75"
+              className="text-gray-700 hover:text-primary transition"
             >
               <span className="sr-only">Facebook</span>
 
@@ -40,7 +39,7 @@ export default function Footer() {
               href="#"
               rel="noreferrer"
               target="_blank"
-              className="text-gray-700 transition hover:opacity-75"
+              className="text-gray-700 hover:text-primary transition"
             >
               <span className="sr-only">Instagram</span>
 
@@ -59,7 +58,7 @@ export default function Footer() {
               href="#"
               rel="noreferrer"
               target="_blank"
-              className="text-gray-700 transition hover:opacity-75"
+              className="text-gray-700 hover:text-primary transition"
             >
               <span className="sr-only">Twitter</span>
 
@@ -76,7 +75,7 @@ export default function Footer() {
               href="#"
               rel="noreferrer"
               target="_blank"
-              className="text-gray-700 transition hover:opacity-75"
+              className="text-gray-700 hover:text-primary transition"
             >
               <span className="sr-only">GitHub</span>
 
@@ -117,23 +116,23 @@ export default function Footer() {
 
           <ul className="mt-6 space-y-4 text-sm">
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> 1on1 Coaching </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> 1on1 Coaching </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Company Review </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Company Review </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Accounts Review </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Accounts Review </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> HR Consulting </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> HR Consulting </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> SEO Optimisation </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> SEO Optimisation </a>
             </li>
           </ul>
         </div>
@@ -143,15 +142,15 @@ export default function Footer() {
 
           <ul className="mt-6 space-y-4 text-sm">
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> About </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> About </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Meet the Team </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Meet the Team </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Accounts Review </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Accounts Review </a>
             </li>
           </ul>
         </div>
@@ -161,15 +160,15 @@ export default function Footer() {
 
           <ul className="mt-6 space-y-4 text-sm">
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Contact </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Contact </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> FAQs </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> FAQs </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Live Chat </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Live Chat </a>
             </li>
           </ul>
         </div>
@@ -179,19 +178,19 @@ export default function Footer() {
 
           <ul className="mt-6 space-y-4 text-sm">
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Accessibility </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Accessibility </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Returns Policy </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Returns Policy </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75"> Refund Policy </a>
+              <a href="#" className="text-gray-700 hover:text-primary transition"> Refund Policy </a>
             </li>
 
             <li>
-              <a href="#" className="text-gray-700 transition hover:opacity-75">
+              <a href="#" className="text-gray-700 hover:text-primary transition">
                 Hiring-3 Statistics
               </a>
             </li>
@@ -200,7 +199,7 @@ export default function Footer() {
       </div>
     </div>
 
-    <p className="text-xs text-gray-500">&copy; 2022. Company Name. All rights reserved.</p>
+    <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()}. Parcel Delivery. All rights reserved.</p>
   </div>
 </footer>
   )
