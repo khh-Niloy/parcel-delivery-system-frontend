@@ -1,69 +1,113 @@
-# React + TypeScript + Vite
+# Parcel Delivery System – Frontend (React + TypeScript + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive frontend for a parcel delivery platform built with React, TypeScript, Vite, RTK Query, and Shadcn UI components.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Authentication-aware navigation with role-based sidebars (Admin, Sender, Receiver, Delivery Agent)
+- Data tables with responsive columns and action buttons
+  - Admin: All Parcels, Users (Senders/Receivers), Delivery Agents
+  - Sender: Create Parcel, Manage Parcels (update/cancel rules based on status)
+  - Receiver: Incoming Parcels, Delivered/Confirmed Parcels with expandable tracking events
+- Track Parcel page with live lookup, overview, delivery summary, and timeline
+- Consistent design system using Shadcn UI primitives and TailwindCSS
+- Toast feedback on actions (logout, tracking fetch success/error, status updates)
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 18, TypeScript, Vite
+- Redux Toolkit + RTK Query
+- Shadcn UI + TailwindCSS
+- Axios (API calls in some pages)
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+1) Install dependencies
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2) Configure environment
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create a `.env` file (or `.env.local`) at the project root:
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_BASE_URL=https://api.example.com/
 ```
+
+3) Run the dev server
+
+```bash
+npm run dev
+```
+
+4) Build for production
+
+```bash
+npm run build
+```
+
+5) Preview production build
+
+```bash
+npm run preview
+```
+
+## Key Pages
+
+- `src/pages/HomePage.tsx`: Marketing landing
+- `src/pages/TrackParcelPage.tsx`: Track parcel by ID; shows overview, route, summary, and timeline
+- `src/pages/sender/CreateParcel.tsx`: Guided parcel creation with fee estimate
+- `src/pages/sender/SenderAllParcel.tsx`: Sender parcel management with update/cancel rules
+- `src/pages/receiver/ReceiverIncomingParcel.tsx`: Table styled like admin with status updates and events
+- `src/pages/receiver/ReceiverDeliveredAndConfirmedParcel.tsx`: Delivered/confirmed list with timeline
+- `src/pages/admin/AllParcelsAdmin.tsx`: Full parcel list with status updates and agent assignment
+- `src/pages/admin/AllSenderAndReceiver.tsx`: Compact users table (merged columns, responsive)
+- `src/pages/admin/AllDeliveryAgent.tsx`: Delivery agents table (availability, metrics, actions)
+
+## Routing
+
+Route definitions live under `src/routes/` and are generated per role. Utility helpers in `src/utils/` aid role checks and dynamic route generation.
+
+## API Layer
+
+- RTK Query endpoints in `src/redux/features/**` wrap REST endpoints
+- Axios helper used in `TrackParcelPage` for direct fetch
+
+Ensure `VITE_BASE_URL` is set correctly and the backend supports CORS with credentials if needed.
+
+## Code Style
+
+- TypeScript-first with explicit types on exported APIs
+- Clear, readable names and early-return control flow
+- Shadcn UI components for consistent tables, forms, and layout
+
+## Linting
+
+```bash
+npm run lint
+```
+
+## Folder Structure (high-level)
+
+```
+src/
+  components/         # UI primitives and shared components
+  pages/              # Route pages by role/feature
+  redux/              # RTK store and RTK Query APIs
+  utils/              # Role checks, route generators, misc utils
+  lib/                # Axios config, env, helpers
+  assets/             # Icons and images
+```
+
+## Contributing
+
+1. Create a feature branch
+2. Implement changes with clear, small commits
+3. Ensure lint passes and UI stays consistent
+4. Open a PR describing changes and screenshots where helpful
+
+## License
+
+MIT
