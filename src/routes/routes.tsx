@@ -15,6 +15,7 @@ import UnauthorizedPage from "@/pages/Unauthorized";
 import { receiverRoutes } from "./receiverRoutes";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
+import TrackParcelPage from "@/pages/TrackParcelPage";
   
 export const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
       {
         path: "/contact",
         Component: ContactPage
+      },
+      {
+        path: "/track-parcel",
+        Component: TrackParcelPage
       }
     ]
   },

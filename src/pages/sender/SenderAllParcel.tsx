@@ -56,7 +56,7 @@ export default function SenderAllParcel() {
                 </TableHeader>
                 <TableBody>
                     {parcels.map((p) => {
-                        const canUpdate = p?.status === "REQUESTED" || p?.status === "APPROVED" || p?.status === "CANCELLED"
+                        const canUpdate = p?.status === "REQUESTED" || p?.status === "APPROVED"
                         const canCancel = p?.status === "REQUESTED" || p?.status === "APPROVED"
                         const hasTrackingEvents = Array.isArray(p?.trackingEvents) && p.trackingEvents.length > 0
                         
@@ -69,7 +69,7 @@ export default function SenderAllParcel() {
                                             {hasTrackingEvents && (
                                                 <button
                                                     type="button"
-                                                    className="text-xs text-primary inline-flex items-center gap-1 w-fit"
+                                                    className="text-xs text-primary inline-flex items-center gap-1 w-fit cursor-pointer"
                                                     onClick={() => toggleDetailsFor(p?.trackingId)}
                                                 >
                                                     {openDetailsIds.has(p?.trackingId) ? (
@@ -162,19 +162,21 @@ export default function SenderAllParcel() {
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex gap-2">
-                                            <Link to={`/sender/update-parcel/${p?.trackingId}`}>
                                             <Button
                                                 variant="outline"
                                                 size="sm"
                                                 disabled={!canUpdate}
                                                 title={!canUpdate ? `Cannot update when status is ${p?.status}` : undefined}
                                             >
+                                            <Link to={`/sender/update-parcel/${p?.trackingId}`}>
                                                 Update
+                                            </Link>
                                             </Button>
-                                            </Link>
+                                            <Button variant="destructive" size="sm" disabled={!canCancel}>
                                             <Link to={`/sender/delete-parcel/${p?.trackingId}`}>
-                                            <Button variant="destructive" size="sm" disabled={!canCancel}>Cancel</Button>
+                                            Cancel
                                             </Link>
+                                            </Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>

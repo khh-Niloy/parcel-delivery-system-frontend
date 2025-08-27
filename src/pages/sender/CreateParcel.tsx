@@ -23,6 +23,8 @@ import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { useCreateParcelMutation } from "@/redux/features/parcel/parcel.api"
 import { toast } from "sonner"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 
 const parcelSchema = z.object({
 	type: z.string().min(1, { message: "Type is required" }),
@@ -72,142 +74,154 @@ export default function CreateParcel() {
 	}
 
 	return (
-		<div className="max-w-2xl w-full">
-			<Form {...(form as any)}>
-				<form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-6">
-					<FormField
-						control={form.control as any}
-						name="type"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Type</FormLabel>
-								<FormControl>
-									<Input placeholder="Enter parcel type" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+		<div className="mx-auto w-full max-w-3xl">
+			<div className="mb-6 text-center">
+				<h1 className="text-2xl font-bold tracking-tight text-gray-900">Create Parcel</h1>
+				<p className="text-sm text-muted-foreground mt-1">Provide parcel details and schedule your delivery</p>
+			</div>
+			<Card className="border-white/40 bg-white/95 backdrop-blur">
+				<CardHeader>
+					<CardTitle className="text-gray-900">Parcel Details</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<Form {...(form as any)}>
+						<form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-8">
+							<div className="grid gap-6 md:grid-cols-2">
+								<FormField
+									control={form.control as any}
+									name="type"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Type</FormLabel>
+											<FormControl>
+												<Input placeholder="e.g. Documents, Electronics" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 
-					<FormField
-						control={form.control as any}
-						name="weight"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Weight (kg)</FormLabel>
-								<FormControl>
-									<Input
-										type="number"
-										step="0.01"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
+								<FormField
+									control={form.control as any}
+									name="weight"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Weight (kg)</FormLabel>
+											<FormControl>
+												<Input type="number" step="0.01" placeholder="e.g. 2.5" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
 
-					{calculatedFee > 0 && (
-						<div className="p-4 bg-muted rounded-lg">
-							<div className="flex justify-between items-center">
-								<span className="text-sm font-medium">Delivery Fee:</span>
-								<span className="text-lg font-bold">৳{calculatedFee}</span>
+							{calculatedFee > 0 && (
+								<div className="rounded-lg border bg-muted/60 p-4">
+									<div className="flex items-center justify-between">
+										<span className="text-sm font-medium">Estimated Delivery Fee</span>
+										<span className="text-lg font-semibold">৳{calculatedFee}</span>
+									</div>
+									<p className="mt-1 text-xs text-muted-foreground">Base ৳30 + ৳15 per kg</p>
+								</div>
+							)}
+
+							<Separator />
+							<div className="grid gap-6 md:grid-cols-2">
+								<FormField
+									control={form.control as any}
+									name="pickupAddress"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Pickup Address</FormLabel>
+											<FormControl>
+												<Input placeholder="House, Road, Area" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control as any}
+									name="deliveryAddress"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Delivery Address</FormLabel>
+											<FormControl>
+												<Input placeholder="House, Road, Area" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
 							</div>
-							<div className="text-xs text-muted-foreground mt-1">
-								Base fee: ৳30 + ৳15/kg
-							</div>
+
+							<Separator />
+							<div className="grid gap-6 md:grid-cols-2">
+								<FormField
+									control={form.control as any}
+									name="receiverPhoneNumber"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>Receiver Phone Number</FormLabel>
+											<FormControl>
+												<Input placeholder="01XXXXXXXXX" {...field} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+					  control={form.control}
+					  name="deliveryDate"
+					  render={({ field }) => (
+					    <FormItem className="flex flex-col">
+					      <FormLabel>Delivery Date</FormLabel>
+					      <Popover>
+					        <PopoverTrigger asChild>
+					          <FormControl>
+					            <Button
+					              variant={"outline"}
+					              className={cn(
+					                "w-full pl-3 text-left font-normal",
+					                !field.value && "text-muted-foreground"
+					              )}
+					            >
+					              {field.value ? (
+					                format(field.value, "PPP")
+					              ) : (
+					                <span>Pick a date</span>
+					              )}
+					              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+					            </Button>
+					          </FormControl>
+					        </PopoverTrigger>
+					        <PopoverContent className="w-auto p-0" align="start">
+					          <Calendar
+					            mode="single"
+					            selected={field.value? new Date(field.value) : undefined}
+					            onSelect={field.onChange}
+					            disabled={(date: Date) =>
+					              date < new Date() || date < new Date("1900-01-01")
+					            }
+					            captionLayout="dropdown"
+					          />
+					        </PopoverContent>
+					      </Popover>
+					      <FormMessage />
+					    </FormItem>
+					  )}
+						/>
 						</div>
-					)}
 
-					<FormField
-						control={form.control as any}
-						name="receiverPhoneNumber"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Receiver Phone Number</FormLabel>
-								<FormControl>
-									<Input placeholder="01XXXXXXXXX" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control as any}
-						name="deliveryAddress"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Delivery Address</FormLabel>
-								<FormControl>
-									<Input placeholder="Enter delivery address" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control as any}
-						name="pickupAddress"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Pickup Address</FormLabel>
-								<FormControl>
-									<Input placeholder="Enter pickup address" {...field} />
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-          control={form.control}
-          name="deliveryDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Delivery Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value? new Date(field.value) : undefined}
-                    onSelect={field.onChange}
-                    disabled={(date: Date) =>
-                      date < new Date() || date < new Date("1900-01-01")
-                    }
-                    captionLayout="dropdown"
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-					<div className="pt-2">
-						<Button type="submit" className="w-full">Create Parcel</Button>
-					</div>
-				</form>
-			</Form>
+						<div className="pt-2">
+							<Button type="submit" className="w-full">Create Parcel</Button>
+						</div>
+						</form>
+					</Form>
+				</CardContent>
+			</Card>
 		</div>
 	)
 }

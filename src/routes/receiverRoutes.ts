@@ -3,7 +3,7 @@ import ReceiverDeliveredAndConfirmedParcel from "@/pages/receiver/ReceiverDelive
 
 export const receiverRoutes = [
   {
-    title: "None",
+    title: "Parcel Management",
     items: [
       {
         title: "Delivered and Confirmed Parcel",
@@ -13,7 +13,7 @@ export const receiverRoutes = [
       {
         title: "Incoming Parcel",
         url: "/receiver/incoming-parcel",
-        component:  ReceiverIncomingParcel,
+        component: ReceiverIncomingParcel,
       },
     ],
   },

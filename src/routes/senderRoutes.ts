@@ -4,7 +4,7 @@ import UpdateParcel from "@/pages/sender/UpdateParcel";
 
 export const senderRoutes = [
   {
-    title: "None",
+    title: "Parcel Management",
     items: [
       {
         title: "Create Parcel",

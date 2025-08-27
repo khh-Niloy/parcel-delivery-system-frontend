@@ -1,8 +1,6 @@
 import { useDeliveredParcelsQuery, useUpdateParcelStatusMutation } from "@/redux/features/parcel/parcel.api"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { format } from "date-fns"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusFlow } from "@/contant/StatusFlow"
 import { useUserInfoQuery } from "@/redux/features/auth/auth.api"
 import { useState } from "react"
@@ -48,7 +46,7 @@ export default function ReceiverDeliveredAndConfirmedParcel() {
 
     return (
         <div className="w-full">
-            <h1 className="text-2xl font-bold mb-6">My Parcels</h1>
+            <h1 className="text-2xl font-bold mb-6">Delivered and Confirmed Parcels</h1>
             <Table>
                 <TableCaption>Parcels relevant to your deliveries.</TableCaption>
                 <TableHeader>

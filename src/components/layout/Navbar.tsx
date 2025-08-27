@@ -16,20 +16,22 @@ import { authApi, useUserInfoQuery, useUserLogoutMutation } from "@/redux/featur
 import { useAppDispatch } from "@/redux/hooks"
 import { toast } from "sonner"
 
-// Navigation links array to be used in both desktop and mobile menus
-const navigationLinks = [
-  { href: "/", label: "Home"},
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-]
-
-
 export default function Navbar() {
   const {data: user} = useUserInfoQuery(undefined)
   console.log(user?.data.role)
 
   let role = user?.data.role
 
+  const navigationLinks = !role ? [
+    { href: "/", label: "Home"},
+      { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact" },
+  ] : [
+      { href: "/", label: "Home"},
+      { href: "/about", label: "About" },
+      { href: "/contact", label: "Contact" },
+      { href: "/track-parcel", label: "Track Parcel" },
+  ]
   if(role === "DELIVERY_AGENT"){
     role = "delivery-agent"
   }

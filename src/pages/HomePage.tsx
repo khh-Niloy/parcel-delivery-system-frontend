@@ -1,7 +1,12 @@
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
+import { useUserInfoQuery } from '@/redux/features/auth/auth.api'
 
 export default function HomePage() {
+
+  const { data: meData } = useUserInfoQuery(undefined)
+  const role = meData?.data?.role
+
   return (
     <main>
       <section className="bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20 sm:py-24 md:py-32">
@@ -25,12 +30,29 @@ export default function HomePage() {
               </p>
               
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                
+                {
+                  role ? (
+                    <div className='flex gap-4'>
                 <Button asChild size="lg" className="bg-primary text-white hover:bg-blue-600 px-8 py-3 text-lg font-semibold">
-                  <Link to="/sender/create-parcel">Start Shipping Now</Link>
+                <Link to="/track-parcel">Tap to track your parcel</Link>
+              </Button>
+                      <Button asChild variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg">
+                <Link to={`/${role?.toLowerCase()}`}>See your parcels</Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg">
-                  <Link to="/about">Watch Demo</Link>
-                </Button>
+                    </div>
+                  )
+                  : (
+                    <div className='flex gap-4'>
+                      <Button asChild size="lg" className="bg-primary text-white hover:bg-blue-600 px-8 py-3 text-lg font-semibold">
+                <Link to="/login">Tap to track your parcel</Link>
+              </Button>
+                    <Button asChild variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg">
+                      <Link to="/about">about ourselves</Link>
+                    </Button>
+                    </div>
+                  )
+                }
               </div>
               
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-8 text-sm text-muted-foreground">
