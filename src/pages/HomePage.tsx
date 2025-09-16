@@ -9,7 +9,7 @@ export default function HomePage() {
 
   return (
     <main>
-      <section className="bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20 sm:py-24 md:py-32">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-blue-100 py-20 sm:py-24 md:py-16">
         <div className="mx-auto max-w-6xl px-4">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="text-center lg:text-left">
