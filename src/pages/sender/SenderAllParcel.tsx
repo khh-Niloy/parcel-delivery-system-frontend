@@ -63,7 +63,17 @@ export default function SenderAllParcel() {
     }
 
     if (!parcels.length) {
-        return <div>No parcels found.</div>
+        return (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="text-2xl font-semibold">No parcels yet</div>
+                <p className="text-muted-foreground mt-2 max-w-md">
+                    You haven’t sent any parcels. Create your first one to get started.
+                </p>
+                <Link to="/sender/create-parcel" className="mt-4">
+                    <Button>Create Parcel</Button>
+                </Link>
+            </div>
+        )
     }
 
     console.log(parcels)
@@ -78,19 +88,20 @@ export default function SenderAllParcel() {
                         <TableHead>Details</TableHead>
                         <TableHead>Addresses</TableHead>
                         <TableHead>Status & Dates</TableHead>
+                        <TableHead>Payment</TableHead>
                         <TableHead>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {parcels.map((p) => {
+                    {parcels.map((p, index) => {
                         const canUpdate = p?.status === "REQUESTED" || p?.status === "APPROVED"
                         const canCancel = p?.status === "REQUESTED" || p?.status === "APPROVED"
                         const hasTrackingEvents = Array.isArray(p?.trackingEvents) && p.trackingEvents.length > 0
                         
                         return (
                             <>
-                                <TableRow key={(p?.trackingId ?? p?._id) + "-main"}>
-                                    <TableCell className="font-medium">
+                                <TableRow key={index}>
+                                    <TableCell key={index} className="font-medium">
                                         <div className="flex flex-col gap-1">
                                             <span>{p?.trackingId}</span>
                                             {hasTrackingEvents && (
@@ -115,28 +126,32 @@ export default function SenderAllParcel() {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="space-y-1">
-                                            <div className="text-sm"><strong>Type:</strong> {p?.type} • <strong>Weight:</strong> {p?.weight} kg • <strong>Fee:</strong> ৳{p?.fee}</div>
+                                        <div key={index} className="space-y-1">
+                                            <div className="text-sm flex flex-col gap-1">
+                                                <p>Type: {p?.type}</p>
+                                                <p>Weight: {p?.weight} kg</p>
+                                                <p>Fee: ৳{p?.fee}</p>
+                                            </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="space-y-1">
+                                        <div key={index} className="space-y-1">
                                             <div>
                                                 <strong>From:</strong> 
                                                 <span className="text-sm text-muted-foreground block whitespace-pre-wrap break-words" title={p?.pickupAddress}>
-                                                    {p?.pickupAddress}
+                                                    {p?.pickupAddress.address}
                                                 </span>
                                             </div>
                                             <div>
                                                 <strong>To:</strong> 
                                                 <span className="text-sm text-muted-foreground block whitespace-pre-wrap break-words" title={p?.deliveryAddress}>
-                                                    {p?.deliveryAddress}
+                                                    {p?.deliveryAddress.address}
                                                 </span>
                                             </div>
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="space-y-1">
+                                        <div key={index} className="space-y-1">
                                             <div>
                                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full ring-1 ring-inset ${
                                                     p?.status === 'REQUESTED' ? 'bg-amber-50 text-amber-700 ring-amber-200/50' :
@@ -180,7 +195,7 @@ export default function SenderAllParcel() {
                                                     {p?.status}
                                                 </span>
                                             </div>
-                                            <div className="text-xs text-muted-foreground">
+                                            <div key={index} className="text-xs text-muted-foreground">
                                                 <div>Delivery: {p?.deliveryDate ? format(new Date(p.deliveryDate), "MMM dd") : "-"}</div>
                                                 <div>Created: {p?.createdAt ? format(new Date(p.createdAt), "MMM dd") : "-"}</div>
                                                 <div>Updated: {p?.updatedAt ? format(new Date(p.updatedAt), "MMM dd") : "-"}</div>
@@ -188,7 +203,21 @@ export default function SenderAllParcel() {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex gap-2">
+                                        <div key={index} className="space-y-1">
+                                            <div>
+                                                    {
+                                                        p?.isPaid ? "Paid" : 
+                                                        <Button variant="outline" size="sm">
+                                                            <a href={p.paymentId?.url} target="_blank" rel="noopener noreferrer">
+                                                                Pay Now
+                                                            </a>
+                                                        </Button>
+                                                    }
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div key={index} className="flex gap-2">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
@@ -211,8 +240,8 @@ export default function SenderAllParcel() {
                                     </TableCell>
                                 </TableRow>
                                 {hasTrackingEvents && openDetailsIds.has(p?.trackingId) && (
-                                    <TableRow key={(p?.trackingId ?? p?._id) + "-details"}>
-                                        <TableCell colSpan={5} className="bg-muted/30 p-4">
+                                    <TableRow key={index}>
+                                        <TableCell key={index} colSpan={5} className="bg-muted/30 p-4">
                                             <div className="space-y-4">
                                                 <div className="text-sm font-semibold">Tracking Events</div>
                                                 <div className="space-y-4">
@@ -231,7 +260,7 @@ export default function SenderAllParcel() {
                                                                             <p className="text-sm text-muted-foreground mt-1 break-words">{event.note}</p>
                                                                         )}
                                                                         {event.location && (
-                                                                            <p className="text-xs text-muted-foreground mt-1"><strong>Location:</strong> {event.location}</p>
+                                                                            <p className="text-xs text-muted-foreground mt-1"><strong>Location:</strong> {event.location.address}</p>
                                                                         )}
                                                                         {event.updatedBy && (
                                                                             <p className="text-xs text-muted-foreground"><strong>Updated by:</strong> {event.updatedBy}</p>

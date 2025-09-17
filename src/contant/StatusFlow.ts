@@ -1,40 +1,59 @@
-export const StatusFlow: Record<string, { next: string[]; allowedRoles: string[] }> = {
-    REQUESTED: {
-        next: ["APPROVED", "CANCELLED"],
-        allowedRoles: ["ADMIN", "SUPER_ADMIN", "SENDER"],
-    },
-    APPROVED: {
-        next: ["DISPATCHED", "BLOCKED", "CANCELLED"],
-        allowedRoles: ["ADMIN", "SENDER"],
-    },
-    // WAITING: {
-    //   next: ["IN_TRANSIT"],
-    //   allowedRoles: ["DELIVERY_AGENT"],
-    // },
-    DISPATCHED: {
-        next: ["IN_TRANSIT"],
-        allowedRoles: ["DELIVERY_AGENT"],
-    },
-    IN_TRANSIT: {
-        next: ["DELIVERED", "RETURNED"],
-        allowedRoles: ["DELIVERY_AGENT"],
-    },
-    RETURNED: {
-        next: [],
-        allowedRoles: ["ADMIN"],
-    },
-    DELIVERED: {
-        next: ["CONFIRMED"],
-        allowedRoles: ["RECEIVER"],
-    },
-    CANCELLED: {
-        next: [],
-        allowedRoles: ["ADMIN", "SENDER"],
-    },
-    BLOCKED: {
-        next: [],
-        allowedRoles: ["ADMIN"],
-    },
-}
+import { Role } from "./Role";
+import { Status } from "./Status";
 
+export const StatusFlow = {
+  REQUESTED: {
+    next: [Status.APPROVED, Status.BLOCKED, Status.CANCELLED],
+    allowedRoles: [Role.admin, Role.superAdmin, Role.sender],
+  },
 
+  BLOCKED: {
+    next: [Status.REQUESTED],
+    allowedRoles: [Role.admin, Role.superAdmin],
+  },
+
+  CANCELLED: {
+    next: [Status.REQUESTED],
+    allowedRoles: [Role.admin, Role.sender, Role.superAdmin],
+  },
+
+  APPROVED: {
+    next: [Status.CANCELLED, Status.PENDING, Status.ASSIGNED],
+    allowedRoles: [Role.admin, Role.superAdmin, Role.sender],
+  },
+
+  PENDING: {
+    next: [Status.ASSIGNED],
+    allowedRoles: [Role.admin, Role.superAdmin],
+  },
+
+  ASSIGNED: {
+    next: [Status.PICKEDUP],
+    allowedRoles: [Role.admin, Role.superAdmin, Role.deliveryAgent],  
+  },
+
+  PICKEDUP: {
+    next: [Status.ON_THE_WAY],
+    allowedRoles: [Role.deliveryAgent],
+  },
+
+  ON_THE_WAY: {
+    next: [Status.DELIVERED],
+    allowedRoles: [Role.deliveryAgent],
+  },
+
+  DELIVERED: {
+    next: [Status.CONFIRMED, Status.RETURNED],
+    allowedRoles: [Role.receiver],
+  },
+
+  CONFIRMED: {
+    next: [],
+    allowedRoles: [Role.receiver],
+  },
+
+  RETURNED: {
+    next: [Status.REQUESTED],
+    allowedRoles: [Role.admin, Role.superAdmin, Role.deliveryAgent],
+  },
+};

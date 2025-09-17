@@ -27,6 +27,29 @@ export const registerZodSchema = z.object({
           .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
               message: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
           }),
+          deliveryAddress: z.object({
+            address: z.string({
+              message: "Delivery address is required",
+            }),
+            latitude: z.number({
+              message: "Delivery address latitude is required",
+            }),
+            longitude: z.number({
+              message: "Delivery address longitude is required",
+            }),
+          }),
+        
+          pickupAddress: z.object({
+            address: z.string({
+              message: "Pickup address is required",
+            }),
+            latitude: z.number({
+              message: "Pickup address latitude is required",
+            }),
+            longitude: z.number({
+              message: "Pickup address longitude is required",
+            }),
+          }),
       address: z
           .string({ message: "Address must be string" })
           .max(200, { message: "Address cannot exceed 200 characters." }),

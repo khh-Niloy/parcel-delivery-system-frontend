@@ -38,7 +38,7 @@ export default function HomePage() {
                 <Link to="/track-parcel">Tap to track your parcel</Link>
               </Button>
                       <Button asChild variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg">
-                <Link to={`/${role?.toLowerCase()}`}>See your parcels</Link>
+                <Link to={`/${role?.toLowerCase()}/all-parcel`}>See your parcels</Link>
                 </Button>
                     </div>
                   )

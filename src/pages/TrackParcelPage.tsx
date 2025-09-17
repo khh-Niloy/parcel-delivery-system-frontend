@@ -99,14 +99,14 @@ export default function TrackParcelPage() {
                         <MapPin className="mt-0.5 h-4 w-4 text-primary" />
                         <div className="min-w-0">
                           <div className="text-xs text-muted-foreground">From</div>
-                          <div className="truncate" title={parcel?.pickupAddress}>{parcel?.pickupAddress}</div>
+                          <div className="truncate" title={parcel?.pickupAddress}>{parcel?.pickupAddress.address}</div>
                         </div>
                       </div>
                       <div className="flex items-start gap-2">
                         <MapPin className="mt-0.5 h-4 w-4 text-primary" />
                         <div className="min-w-0">
                           <div className="text-xs text-muted-foreground">To</div>
-                          <div className="truncate" title={parcel?.deliveryAddress}>{parcel?.deliveryAddress}</div>
+                          <div className="truncate" title={parcel?.deliveryAddress}>{parcel?.deliveryAddress.address}</div>
                         </div>
                       </div>
                     </div>
@@ -166,7 +166,7 @@ export default function TrackParcelPage() {
                             <p className="text-sm text-muted-foreground mt-1 break-words">{event.note}</p>
                           )}
                           {event.location && (
-                            <p className="text-xs text-muted-foreground mt-1"><strong>Location:</strong> {event.location}</p>
+                            <p className="text-xs text-muted-foreground mt-1"><strong>Location:</strong> {event.location.address}</p>
                           )}
                           {event.updatedBy && (
                             <p className="text-xs text-muted-foreground"><strong>Updated by:</strong> {event.updatedBy}</p>

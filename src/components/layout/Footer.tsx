@@ -199,7 +199,7 @@ export default function Footer() {
       </div>
     </div>
 
-    <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()}. Parcel Delivery. All rights reserved.</p>
+    <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()}. FastPathao. All rights reserved.</p>
   </div>
 </footer>
   )
