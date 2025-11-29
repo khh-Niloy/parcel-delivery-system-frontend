@@ -1,113 +1,230 @@
-# Parcel Delivery System – Frontend (React + TypeScript + Vite)
+# Parcel Delivery System – Frontend
 
-A modern, responsive frontend for a parcel delivery platform built with React, TypeScript, Vite, RTK Query, and Shadcn UI components.
+A modern, responsive frontend for a comprehensive parcel delivery platform built with React, TypeScript, and Vite. This application provides a complete solution for managing parcel deliveries with role-based access control for administrators, senders, receivers, and delivery agents.
 
-## Features
+## 🚀 Project Overview
 
-- Authentication-aware navigation with role-based sidebars (Admin, Sender, Receiver, Delivery Agent)
-- Data tables with responsive columns and action buttons
-  - Admin: All Parcels, Users (Senders/Receivers), Delivery Agents
-  - Sender: Create Parcel, Manage Parcels (update/cancel rules based on status)
-  - Receiver: Incoming Parcels, Delivered/Confirmed Parcels with expandable tracking events
-- Track Parcel page with live lookup, overview, delivery summary, and timeline
-- Consistent design system using Shadcn UI primitives and TailwindCSS
-- Toast feedback on actions (logout, tracking fetch success/error, status updates)
+The Parcel Delivery System Frontend is a full-featured web application that streamlines the entire parcel delivery process. It offers:
 
-## Tech Stack
+- **Multi-role Dashboard**: Tailored interfaces for different user types (Admin, Sender, Receiver, Delivery Agent)
+- **Real-time Tracking**: Live parcel tracking with detailed status updates and timeline
+- **Smart Status Management**: Automated status transitions based on business rules
+- **Responsive Design**: Mobile-first approach with consistent UI/UX across all devices
+- **Modern Architecture**: Built with React 18, TypeScript, and modern tooling
 
-- React 18, TypeScript, Vite
-- Redux Toolkit + RTK Query
-- Shadcn UI + TailwindCSS
-- Axios (API calls in some pages)
+### Key Features
 
-## Getting Started
+- **Authentication & Authorization**: Secure login with role-based access control
+- **Parcel Management**: Create, update, track, and manage parcels throughout their lifecycle
+- **User Management**: Admin tools for managing users, delivery agents, and system settings
+- **Real-time Updates**: Live status updates with toast notifications
+- **Responsive Tables**: Smart, responsive data tables with collapsible details
+- **Tracking System**: Comprehensive parcel tracking with detailed event history
 
-1) Install dependencies
+## 🛠 Technology Stack
 
-```bash
-npm install
-```
+### Frontend Framework
+- **React 18** - Modern React with hooks and concurrent features
+- **TypeScript** - Type-safe development with strict configuration
+- **Vite** - Fast build tool and development server
 
-2) Configure environment
+### State Management & API
+- **Redux Toolkit** - Predictable state management
+- **RTK Query** - Powerful data fetching and caching
+- **Axios** - HTTP client for direct API calls
 
-Create a `.env` file (or `.env.local`) at the project root:
+### UI & Styling
+- **Shadcn UI** - High-quality, accessible component library
+- **TailwindCSS** - Utility-first CSS framework
+- **Lucide React** - Beautiful, customizable icons
 
-```bash
-VITE_BASE_URL=https://api.example.com/
-```
+### Development Tools
+- **ESLint** - Code linting and quality enforcement
+- **Prettier** - Code formatting
+- **Sonner** - Toast notifications
 
-3) Run the dev server
+## 📋 Setup Instructions
 
-```bash
-npm run dev
-```
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn package manager
+- Git
 
-4) Build for production
+### Installation
 
-```bash
-npm run build
-```
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd parcel-delivery-system-frontend
+   ```
 
-5) Preview production build
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run preview
-```
+3. **Environment Configuration**
+   
+   Create a `.env` file in the project root:
+   ```bash
+   VITE_BASE_URL=https://your-api-domain.com/
+   ```
 
-## Key Pages
+4. **Start Development Server**
+   ```bash
+   npm run dev
+   ```
+   
+   The application will be available at `http://localhost:5173`
 
-- `src/pages/HomePage.tsx`: Marketing landing
-- `src/pages/TrackParcelPage.tsx`: Track parcel by ID; shows overview, route, summary, and timeline
-- `src/pages/sender/CreateParcel.tsx`: Guided parcel creation with fee estimate
-- `src/pages/sender/SenderAllParcel.tsx`: Sender parcel management with update/cancel rules
-- `src/pages/receiver/ReceiverIncomingParcel.tsx`: Table styled like admin with status updates and events
-- `src/pages/receiver/ReceiverDeliveredAndConfirmedParcel.tsx`: Delivered/confirmed list with timeline
-- `src/pages/admin/AllParcelsAdmin.tsx`: Full parcel list with status updates and agent assignment
-- `src/pages/admin/AllSenderAndReceiver.tsx`: Compact users table (merged columns, responsive)
-- `src/pages/admin/AllDeliveryAgent.tsx`: Delivery agents table (availability, metrics, actions)
+### Build & Deployment
 
-## Routing
+1. **Build for Production**
+   ```bash
+   npm run build
+   ```
 
-Route definitions live under `src/routes/` and are generated per role. Utility helpers in `src/utils/` aid role checks and dynamic route generation.
+2. **Preview Production Build**
+   ```bash
+   npm run preview
+   ```
 
-## API Layer
+3. **Lint Code**
+   ```bash
+   npm run lint
+   ```
 
-- RTK Query endpoints in `src/redux/features/**` wrap REST endpoints
-- Axios helper used in `TrackParcelPage` for direct fetch
+## 🌐 Live URL
 
-Ensure `VITE_BASE_URL` is set correctly and the backend supports CORS with credentials if needed.
+**Development**: `http://localhost:5173`
 
-## Code Style
+**Production**: [Deploy to your preferred hosting platform]
 
-- TypeScript-first with explicit types on exported APIs
-- Clear, readable names and early-return control flow
-- Shadcn UI components for consistent tables, forms, and layout
+### Deployment Options
+- **Vercel**: Zero-config deployment with automatic builds
+- **Netlify**: Drag-and-drop deployment with form handling
+- **AWS S3 + CloudFront**: Static hosting with CDN
+- **Firebase Hosting**: Google's hosting solution
 
-## Linting
-
-```bash
-npm run lint
-```
-
-## Folder Structure (high-level)
+## 📁 Project Structure
 
 ```
 src/
-  components/         # UI primitives and shared components
-  pages/              # Route pages by role/feature
-  redux/              # RTK store and RTK Query APIs
-  utils/              # Role checks, route generators, misc utils
-  lib/                # Axios config, env, helpers
-  assets/             # Icons and images
+├── components/           # Reusable UI components
+│   ├── ui/              # Shadcn UI primitives
+│   ├── layout/          # Layout components (Navbar, Sidebar, etc.)
+│   └── modules/         # Feature-specific components
+├── pages/               # Route pages organized by role
+│   ├── admin/           # Admin-specific pages
+│   ├── sender/          # Sender-specific pages
+│   ├── receiver/        # Receiver-specific pages
+│   └── deliveryAgent/   # Delivery agent pages
+├── redux/               # State management
+│   ├── features/        # RTK Query APIs
+│   └── store.ts         # Redux store configuration
+├── routes/              # Route definitions
+├── utils/               # Utility functions
+├── lib/                 # Configuration and helpers
+└── assets/              # Static assets
 ```
 
-## Contributing
+## 🔐 Authentication & Roles
 
-1. Create a feature branch
-2. Implement changes with clear, small commits
-3. Ensure lint passes and UI stays consistent
-4. Open a PR describing changes and screenshots where helpful
+The system supports four distinct user roles:
 
-## License
+### Admin
+- Manage all parcels and users
+- Assign delivery agents
+- View system analytics
+- Block/unblock users
 
-MIT
+### Sender
+- Create new parcels
+- Track parcel status
+- Update parcel details (before dispatch)
+- Cancel parcels (before dispatch)
+
+### Receiver
+- View incoming parcels
+- Confirm delivery
+- Track parcel progress
+- View delivery history
+
+### Delivery Agent
+- View assigned parcels
+- Update parcel status
+- Mark parcels as delivered
+- Add delivery notes
+
+## 📊 API Integration
+
+The frontend integrates with a RESTful backend API:
+
+- **Base URL**: Configured via `VITE_BASE_URL` environment variable
+- **Authentication**: JWT-based with secure cookie storage
+- **CORS**: Configured for cross-origin requests
+- **Error Handling**: Comprehensive error handling with user-friendly messages
+
+### Key Endpoints
+- `/auth/*` - Authentication endpoints
+- `/parcel/*` - Parcel management
+- `/user/*` - User management
+- `/admin/*` - Administrative functions
+
+## 🎨 Design System
+
+The application uses a consistent design system built on:
+
+- **Color Palette**: Blue primary theme with semantic colors
+- **Typography**: Inter font family with consistent sizing
+- **Spacing**: 4px base unit system
+- **Components**: Reusable, accessible UI components
+- **Responsive**: Mobile-first responsive design
+
+## 🚀 Performance Features
+
+- **Code Splitting**: Automatic route-based code splitting
+- **Lazy Loading**: Components loaded on demand
+- **Caching**: RTK Query provides intelligent caching
+- **Optimized Builds**: Vite provides fast builds and HMR
+
+## 🔧 Development Notes
+
+### Code Style
+- TypeScript strict mode enabled
+- ESLint configuration for code quality
+- Prettier for consistent formatting
+- Conventional commit messages
+
+### Testing
+- Unit tests for utility functions
+- Integration tests for API calls
+- E2E tests for critical user flows
+
+### Browser Support
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Mobile browsers (iOS Safari, Chrome Mobile)
+- Progressive Web App (PWA) ready
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation
+
+---
+
+**Built with ❤️ using React, TypeScript, and modern web technologies**

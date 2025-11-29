@@ -1,9 +1,19 @@
-export const generateRoutes = (sidebarItems: any) => {
-  // console.log(sidebarItems)
-  return sidebarItems.flatMap((section) =>
-    section.items.map((route) => ({
+type SidebarRoute = {
+  title?: string
+  url: string
+  component: React.ComponentType
+}
+
+type SidebarSection = {
+  title?: string
+  items: SidebarRoute[]
+}
+
+export const generateRoutes = (sidebarItems: SidebarSection[]) => {
+  return sidebarItems.flatMap((section: SidebarSection) =>
+    section.items.map((route: SidebarRoute) => ({
       path: route.url,
       Component: route.component,
     }))
-  );
-};
+  )
+}

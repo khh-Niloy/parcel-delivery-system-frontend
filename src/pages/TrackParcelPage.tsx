@@ -10,6 +10,7 @@ import { toast } from "sonner"
 export default function TrackParcelPage() {
   const [trackingId, setTrackingId] = useState("")
   const [parcel, setParcel] = useState<any | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleTrackParcel = async (trackingId: string) => {
     try {
@@ -17,6 +18,7 @@ export default function TrackParcelPage() {
         toast.error("Please enter a tracking ID")
         return
       }
+      setIsLoading(true)
       const res = await axios.get(
         `${import.meta.env.VITE_BASE_URL}parcel/single-parcel/${trackingId}`,
         { withCredentials: true }
@@ -32,6 +34,8 @@ export default function TrackParcelPage() {
     } catch (error: any) {
       setParcel(null)
       toast.error(error?.response?.data?.message || "Failed to fetch parcel. Please try again.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -54,9 +58,9 @@ export default function TrackParcelPage() {
                 className="pl-9"
               />
             </div>
-            <Button type="button" className="gap-2" onClick={() => handleTrackParcel(trackingId)}>
+            <Button type="button" className="gap-2" onClick={() => handleTrackParcel(trackingId)} disabled={isLoading}>
               <Search className="h-4 w-4" />
-              Track
+              {isLoading ? "Tracking..." : "Track"}
             </Button>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">Tip: You can find the tracking ID in your confirmation email or dashboard.</p>

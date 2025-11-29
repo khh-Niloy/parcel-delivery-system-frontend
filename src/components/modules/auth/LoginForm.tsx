@@ -54,7 +54,8 @@ export function LoginForm({
         form.reset()
         navigate("/")
       }
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error.data?.message || "Login failed")
       console.log(error)
     }
   }

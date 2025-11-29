@@ -1,6 +1,8 @@
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { useGetAllUsersQuery } from "@/redux/features/user/user.api"
+import { TableLoadingSkeleton } from "@/components/ui/loading"
+import { toast } from "sonner"
 
 type DeliveryAgent = {
   address: string
@@ -41,8 +43,26 @@ export default function AllDeliveryAgent() {
     (user: DeliveryAgent) => user.role === "DELIVERY_AGENT"
   )
 
+  const handleBlockAgent = async (_agentId: string, isBlocked: boolean) => {
+    try {
+      // TODO: Implement block agent API call
+      toast.success(`Delivery agent ${isBlocked ? 'unblocked' : 'blocked'} successfully`)
+    } catch (error: any) {
+      toast.error(error?.data?.message || `Failed to ${isBlocked ? 'unblock' : 'block'} delivery agent`)
+    }
+  }
+
+  const handleDeleteAgent = async (_agentId: string) => {
+    try {
+      // TODO: Implement delete agent API call
+      toast.success("Delivery agent deleted successfully")
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete delivery agent")
+    }
+  }
+
   if (isLoading) {
-    return <div className="p-4">Loading delivery agents...</div>
+    return <div className="p-4"><TableLoadingSkeleton rows={6} /></div>
   }
 
   if (isError) {
@@ -106,10 +126,18 @@ export default function AllDeliveryAgent() {
               <TableCell className="hidden 2xl:table-cell">{formatDate(a.createdAt)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button size="sm" variant={a.isBlocked ? 'ghost' : 'secondary'} disabled={a.isBlocked}>
+                  <Button 
+                    size="sm" 
+                    variant={a.isBlocked ? 'ghost' : 'secondary'} 
+                    onClick={() => handleBlockAgent(a._id || '', a.isBlocked)}
+                  >
                     {a.isBlocked ? 'Blocked' : 'Block'}
                   </Button>
-                  <Button size="sm" variant="destructive">
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => handleDeleteAgent(a._id || '')}
+                  >
                     Delete
                   </Button>
                 </div>

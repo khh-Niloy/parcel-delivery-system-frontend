@@ -26,28 +26,8 @@ import {
 import { useRegisterMutation } from "@/redux/features/auth/auth.api"
 import { toast } from "sonner"
 import { useNavigate, Link } from "react-router"
+import { registerZodSchema } from "@/utils/registerZod"
     
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Invalid email address.",
-  }),
-  password: z.string().min(8, {
-    message: "Password must be at least 8 characters.",
-  }),
-  address: z.string().min(10, {
-    message: "Address must be at least 10 characters.",
-  }),
-  phone: z.string().min(11, {
-    message: "Phone number must be at least 11 characters.",
-  }),
-  role: z.enum(["RECEIVER", "SENDER"], {
-    message: "Please select a valid role.",
-  }),
-})
-
 export function RegisterForm({
   className,
   ...props
@@ -55,8 +35,8 @@ export function RegisterForm({
 
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof registerZodSchema>>({
+    resolver: zodResolver(registerZodSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -69,17 +49,18 @@ export function RegisterForm({
 
   const [register] = useRegisterMutation()
 
-  const onSubmit = async(data: z.infer<typeof formSchema>) => {
+  const onSubmit = async(data: z.infer<typeof registerZodSchema>) => {
     try {
       console.log(data)
     const res = await register(data).unwrap()
     console.log(res)
-    if(res.data.success){
+    if(res.success){
       toast.success("Registration successful")
       navigate("/login")
       form.reset()
     }
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.data?.errors || "Registration failed. Please try again.")
       console.log(error)
     }
   }

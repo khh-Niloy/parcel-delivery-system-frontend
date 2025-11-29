@@ -23,7 +23,7 @@ import { Home, ArrowLeft } from "lucide-react"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
-  const {data: user, isLoading} = useUserInfoQuery(undefined)
+  const {data: user} = useUserInfoQuery(undefined)
   const location = useLocation()
 
 console.log(user?.data?.role)
@@ -52,7 +52,7 @@ const data = {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/"}>
+                <SidebarMenuButton asChild isActive={location.pathname === "/"} className="data-[active=true]:text-primary">
                   <Link to="/" className="flex items-center gap-2">
                     <Home className="h-4 w-4" />
                     <span>Home</span>
@@ -69,16 +69,19 @@ const data = {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((subItem) => (
-                  <SidebarMenuItem key={subItem.title}>
-                    <SidebarMenuButton asChild isActive={location.pathname.startsWith(subItem.url)}>
-                      <Link to={subItem.url} className="flex items-center gap-2">
-                        {subItem.icon}
+                {item.items.map((subItem, index) => {
+                  const rootSegment = `/${location.pathname.split("/")[1] || ""}`
+                  const staticPrefix = `${rootSegment}/${subItem.url.split("/:")[0]}`
+                  const isActive = location.pathname === staticPrefix || location.pathname.startsWith(`${staticPrefix}/`)
+                  return (
+                  <SidebarMenuItem key={index}>
+                    <SidebarMenuButton key={index} asChild isActive={isActive} className="data-[active=true]:text-primary">
+                      <Link key={index} to={subItem.url} className="flex items-center gap-2">
                         <span>{subItem.title}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
+                )})}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
