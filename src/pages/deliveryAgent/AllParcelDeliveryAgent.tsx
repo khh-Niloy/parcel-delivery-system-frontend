@@ -17,7 +17,6 @@ import {
     DialogContent,
     DialogDescription,
     DialogHeader,
-    DialogTrigger,
   } from "@/components/ui/dialog"
 
 export default function AllParcelDeliveryAgent() {
@@ -162,7 +161,7 @@ export default function AllParcelDeliveryAgent() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {parcels.map((p, index) => {
+                        {parcels.map((p) => {
                             const hasTrackingEvents = Array.isArray(p?.trackingEvents) && p.trackingEvents.length > 0
                             const currentStatus: string = p?.status
                             const nextStatuses: string[] = Array.isArray(StatusFlow[currentStatus as keyof typeof StatusFlow]?.next) ? StatusFlow[currentStatus as keyof typeof StatusFlow].next : [] 

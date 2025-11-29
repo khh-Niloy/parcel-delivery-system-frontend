@@ -111,40 +111,101 @@ export default function CreateParcel() {
   const fetchAddressFromCoords = React.useCallback(async (lat: number, lng: number) => {
     setMapAddress("Loading address...");
     
-    try {
-      const geocodeUrl = import.meta.env.DEV 
-        ? `/nominatim/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
-        : `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`;
+    // Try multiple geocoding services in order of preference
+    const geocodingServices = [
+      {
+        name: 'Nominatim (Proxy)',
+        url: `/nominatim/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&accept-language=en`,
+        parseResponse: (data: any) => data,
+        condition: () => import.meta.env.DEV
+      },
+      {
+        name: 'BigDataCloud',
+        url: `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`,
+        parseResponse: (data: any) => {
+          if (data && (data.locality || data.city)) {
+            const addressParts = [
+              data.locality || data.city,
+              data.principalSubdivision,
+              data.countryName
+            ].filter(Boolean);
+            return { display_name: addressParts.join(', ') };
+          }
+          return null;
+        },
+        condition: () => true
+      },
+      {
+        name: 'Nominatim (Direct)',
+        url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&accept-language=en`,
+        parseResponse: (data: any) => data,
+        condition: () => !import.meta.env.DEV
+      }
+    ];
+
+    for (const service of geocodingServices) {
+      if (!service.condition()) continue;
+      
+      try {
+        console.log(`Trying ${service.name}:`, service.url);
         
-      const headers: HeadersInit = {
-        'Accept': 'application/json',
-      };
-      
-      if (!import.meta.env.DEV) {
-        headers['User-Agent'] = 'ParcelDeliveryApp/1.0';
+        const headers: HeadersInit = {
+          'Accept': 'application/json',
+        };
+        
+        // Add User-Agent for direct Nominatim calls
+        if (service.name.includes('Nominatim') && !import.meta.env.DEV) {
+          headers['User-Agent'] = 'ParcelDeliveryApp/1.0';
+        }
+        
+        const res = await fetch(service.url, {
+          method: 'GET',
+          headers,
+          ...(import.meta.env.DEV && service.name.includes('Proxy') ? { credentials: 'same-origin' } : {})
+        });
+        
+        if (!res.ok) {
+          throw new Error(`${service.name} failed: ${res.status} ${res.statusText}`);
+        }
+        
+        const rawData = await res.json();
+        const data = service.parseResponse(rawData);
+        
+        console.log(`${service.name} response:`, data);
+        
+        if (data && data.display_name) {
+          setMapAddress(data.display_name);
+          return; // Success, exit the loop
+        } else if (data && data.address) {
+          // Try to construct address from address components
+          const addr = data.address;
+          const addressParts = [
+            addr.house_number,
+            addr.road,
+            addr.neighbourhood || addr.suburb,
+            addr.city || addr.town || addr.village,
+            addr.state,
+            addr.country
+          ].filter(Boolean);
+          
+          if (addressParts.length > 0) {
+            setMapAddress(addressParts.join(', '));
+            return; // Success, exit the loop
+          }
+        }
+        
+        throw new Error(`${service.name} returned no usable address data`);
+        
+      } catch (error) {
+        console.error(`${service.name} failed:`, error);
+        // Continue to next service
       }
-      
-      const res = await fetch(geocodeUrl, {
-        method: 'GET',
-        headers,
-        ...(import.meta.env.DEV ? { credentials: 'same-origin' } : {})
-      });
-      
-      if (!res.ok) {
-        throw new Error(`Geocoding failed: ${res.status} ${res.statusText}`);
-      }
-      
-      const data = await res.json();
-      
-      if (data && data.display_name) {
-        setMapAddress(data.display_name);
-      } else {
-        setMapAddress(`Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-      }
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      setMapAddress(`Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
     }
+    
+    // All services failed, use coordinates as fallback
+    console.warn('All geocoding services failed, using coordinates');
+    setMapAddress(`Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+    toast.error("Could not fetch address. Using coordinates instead.");
   }, []);
 
   // Get user's current location
