@@ -38,7 +38,7 @@ export default function HomePage() {
                 <Link to="/track-parcel">Tap to track your parcel</Link>
               </Button>
                       <Button asChild variant="outline" size="lg" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg">
-                <Link to={`/${role?.toLowerCase()}`}>See your parcels</Link>
+                <Link to={`/${role?.toLowerCase()}/all-parcel`}>See your parcels</Link>
                 </Button>
                     </div>
                   )
@@ -219,56 +219,6 @@ export default function HomePage() {
               <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
             </div>
           ))}
-        </div>
-      </section>
-      <section className="border-y bg-gray-50">
-        <div className="mx-auto max-w-7xl px-4 py-12">
-          <div className="grid items-center gap-8 md:grid-cols-2">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                Built for scale and reliability
-              </h2>
-              <p className="mt-2 text-muted-foreground">
-                Our network processes thousands of parcels per hour with enterprise‑grade uptime.
-              </p>
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-white p-6 shadow-sm">
-                  <p className="text-3xl font-bold text-blue-600">1M+</p>
-                  <p className="text-sm text-gray-600">Parcels delivered</p>
-                </div>
-                <div className="rounded-lg bg-white p-6 shadow-sm">
-                  <p className="text-3xl font-bold text-green-600">99.9%</p>
-                  <p className="text-sm text-gray-600">Uptime</p>
-                </div>
-                <div className="rounded-lg bg-white p-6 shadow-sm">
-                  <p className="text-3xl font-bold text-orange-600">24/7</p>
-                  <p className="text-sm text-gray-600">Support</p>
-                </div>
-                <div className="rounded-lg bg-white p-6 shadow-sm">
-                  <p className="text-3xl font-bold text-purple-600">200+</p>
-                  <p className="text-sm text-gray-600">Countries</p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-xl border bg-white p-8 shadow-sm">
-              <h3 className="text-xl font-bold mb-3">Ready to ship smarter?</h3>
-              <p className="text-muted-foreground mb-6">Get started in minutes—no credit card required.</p>
-              <div className="flex flex-wrap gap-3">
-                <Button asChild className="bg-primary text-white hover:bg-blue-600">
-                  <Link to="/register">Create Account</Link>
-                </Button>
-                <Button asChild variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-                  <Link to="/contact">Talk to Sales</Link>
-                </Button>
-              </div>
-              <div className="mt-6 pt-6 border-t">
-                <p className="text-sm text-muted-foreground">Already have an account?</p>
-                <Button asChild variant="link" className="p-0 h-auto text-primary">
-                  <Link to="/login">Sign in here</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
     </main>

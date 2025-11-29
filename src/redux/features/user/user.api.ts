@@ -11,10 +11,18 @@ export const userApi = baseApi.injectEndpoints({
                 return response.data
             }
         }),
+        updateUserAvailableStatus: builder.mutation({
+            query: (userInfo)=>({
+                url: `/user/update-available-status/${userInfo.id}`,
+                method: "PATCH",
+                data: userInfo
+            }),
+        }),
         
     })
 })
 
 export const {
     useGetAllUsersQuery,
+    useUpdateUserAvailableStatusMutation,
 } = userApi;

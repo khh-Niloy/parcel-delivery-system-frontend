@@ -88,21 +88,6 @@ export default function RegisterPage() {
               </div>
             </div>
           </div>
-
-          <div className="text-center mt-8">
-            <p className="text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
-                Sign in here
-              </Link>
-            </p>
-            <p className="text-gray-600 mt-2">
-              Want to become a delivery partner?{' '}
-              <Link to="/delivery-agent-register" className="text-blue-600 hover:text-blue-700 font-medium">
-                Apply here
-              </Link>
-            </p>
-          </div>
         </div>
       </div>
     </div>

@@ -12,4 +12,23 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      '/nominatim': {
+        target: 'https://nominatim.openstreetmap.org',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/nominatim/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            proxyReq.setHeader('User-Agent', 'ParcelDeliveryApp/1.0 (contact@yourapp.com)');
+            proxyReq.setHeader('Accept', 'application/json');
+            proxyReq.setHeader('Accept-Language', 'en-US,en;q=0.9');
+          });
+          proxy.on('proxyRes', (proxyRes) => {
+            proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+          });
+        }
+      }
+    }
+  }
 })

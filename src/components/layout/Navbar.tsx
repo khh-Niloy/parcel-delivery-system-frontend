@@ -26,6 +26,7 @@ export default function Navbar() {
     { href: "/", label: "Home"},
       { href: "/about", label: "About" },
       { href: "/contact", label: "Contact" },
+      { href: "/track-parcel", label: "Track Parcel" },
   ] : [
       { href: "/", label: "Home"},
       { href: "/about", label: "About" },
@@ -103,7 +104,7 @@ export default function Navbar() {
           <div className="flex items-center gap-6">
             <a href="/" className="group inline-flex items-center">
               <Logo />
-              <span className="sr-only">Parcel Delivery</span>
+              <span className="sr-only">FastPathao</span>
             </a>
             <NavigationMenu className="h-full *:h-full max-md:hidden">
               <NavigationMenuList className="h-full gap-2">

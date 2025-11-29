@@ -65,8 +65,8 @@ export default function ReceiverDeliveredAndConfirmedParcel() {
                         const hasTrackingEvents = Array.isArray(p?.trackingEvents) && p.trackingEvents.length > 0
 
                         const currentStatus: string = p?.status
-                        const nextStatuses: string[] = Array.isArray(StatusFlow[currentStatus]?.next) ? StatusFlow[currentStatus].next : []
-                        const allowedRolesForCurrent: string[] = Array.isArray(StatusFlow[currentStatus]?.allowedRoles) ? StatusFlow[currentStatus].allowedRoles : []
+                        const nextStatuses: string[] = Array.isArray(StatusFlow[currentStatus as keyof typeof StatusFlow]?.next) ? StatusFlow[currentStatus as keyof typeof StatusFlow].next : []
+                        const allowedRolesForCurrent: string[] = Array.isArray(StatusFlow[currentStatus as keyof typeof StatusFlow]?.allowedRoles) ? StatusFlow[currentStatus as keyof typeof StatusFlow].allowedRoles : []
                         const userRole: string | undefined = meData?.data?.role
 
                         // Delivery agent can change status only if allowed by the flow for current status
