@@ -91,27 +91,95 @@ export default function CreateParcel() {
   const [activeField, setActiveField] = React.useState<"pickup" | "delivery">(
     "delivery"
   );
+  // Default to Dhaka, Bangladesh coordinates
+  const defaultPos = { lat: 23.8103, lng: 90.4125 };
+  
   // Temporary selection inside modal
-  const [mapPos, setMapPos] = React.useState<{ lat: number; lng: number }>({
-    lat: 23.8103,
-    lng: 90.4125,
-  });
+  const [mapPos, setMapPos] = React.useState<{ lat: number; lng: number }>(defaultPos);
   const [mapAddress, setMapAddress] = React.useState<string>("");
   // Persisted positions for each field
   const [pickupPos, setPickupPos] = React.useState<{
     lat: number;
     lng: number;
-  }>({ lat: 23.8103, lng: 90.4125 });
+  }>(defaultPos);
   const [deliveryPos, setDeliveryPos] = React.useState<{
     lat: number;
     lng: number;
-  }>({ lat: 23.8103, lng: 90.4125 });
+  }>(defaultPos);
+
+  // Function to fetch address from coordinates
+  const fetchAddressFromCoords = React.useCallback(async (lat: number, lng: number) => {
+    setMapAddress("Loading address...");
+    
+    try {
+      const geocodeUrl = import.meta.env.DEV 
+        ? `/nominatim/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
+        : `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`;
+        
+      const headers: HeadersInit = {
+        'Accept': 'application/json',
+      };
+      
+      if (!import.meta.env.DEV) {
+        headers['User-Agent'] = 'ParcelDeliveryApp/1.0';
+      }
+      
+      const res = await fetch(geocodeUrl, {
+        method: 'GET',
+        headers,
+        ...(import.meta.env.DEV ? { credentials: 'same-origin' } : {})
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Geocoding failed: ${res.status} ${res.statusText}`);
+      }
+      
+      const data = await res.json();
+      
+      if (data && data.display_name) {
+        setMapAddress(data.display_name);
+      } else {
+        setMapAddress(`Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      setMapAddress(`Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+    }
+  }, []);
+
+  // Get user's current location
+  const getCurrentLocation = React.useCallback(async () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          const newPos = { lat: latitude, lng: longitude };
+          setMapPos(newPos);
+          
+          // Fetch address for current location
+          await fetchAddressFromCoords(latitude, longitude);
+          
+          if (activeField === "pickup") {
+            setPickupPos(newPos);
+          } else {
+            setDeliveryPos(newPos);
+          }
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          toast.error("Could not get your current location");
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by this browser");
+    }
+  }, [activeField, fetchAddressFromCoords]);
   const form = useForm<ParcelFormValues>({
     resolver: zodResolver(parcelSchema) as any,
     mode: "onBlur",
     defaultValues: {
-      pickupAddress: { address: "", latitude: 23.8103, longitude: 90.4125 },
-      deliveryAddress: { address: "", latitude: 23.8103, longitude: 90.4125 },
+      pickupAddress: { address: "", latitude: defaultPos.lat, longitude: defaultPos.lng },
+      deliveryAddress: { address: "", latitude: defaultPos.lat, longitude: defaultPos.lng },
     } as any,
   });
   const { setValue, getValues, handleSubmit, watch, register } = form as any;
@@ -121,27 +189,7 @@ export default function CreateParcel() {
       click: async (e) => {
         const { lat, lng } = e.latlng;
         setMapPos({ lat, lng });
-        try {
-          // Use proxy in development, backend API in production
-          const geocodeUrl = import.meta.env.DEV 
-            ? `/nominatim/reverse?format=json&lat=${lat}&lon=${lng}`
-            : `${import.meta.env.VITE_BASE_URL}/geocode/reverse?lat=${lat}&lon=${lng}`;
-            
-          const res = await fetch(geocodeUrl, {
-            credentials: import.meta.env.DEV ? 'same-origin' : 'include'
-          });
-          
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-          
-          const data = await res.json();
-          console.log(data);
-          setMapAddress(data?.display_name || "");
-        } catch (error) {
-          console.error('Geocoding error:', error);
-          setMapAddress("");
-        }
+        await fetchAddressFromCoords(lat, lng);
       },
     });
     return null;
@@ -409,13 +457,23 @@ export default function CreateParcel() {
                   <h3 className="text-lg font-semibold">
                     Select address on map
                   </h3>
-                  <button
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-gray-600"
-                    onClick={() => setIsMapOpen(false)}
-                    aria-label="Close"
-                  >
-                    <span>✕</span>
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={getCurrentLocation}
+                    >
+                      Use Current Location
+                    </Button>
+                    <button
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md border text-gray-600"
+                      onClick={() => setIsMapOpen(false)}
+                      aria-label="Close"
+                    >
+                      <span>✕</span>
+                    </button>
+                  </div>
                 </div>
                 <div style={{ height: "300px", width: "100%" }}>
                   <MapContainer
@@ -433,19 +491,21 @@ export default function CreateParcel() {
                 </div>
                 <div className="mt-3 rounded border bg-gray-50 p-3 text-sm">
                   <p>
-                    <strong>Latitude:</strong> {mapPos.lat}
+                    <strong>Latitude:</strong> {mapPos.lat.toFixed(6)}
                   </p>
                   <p>
-                    <strong>Longitude:</strong> {mapPos.lng}
+                    <strong>Longitude:</strong> {mapPos.lng.toFixed(6)}
                   </p>
                   <p>
                     <strong>Address:</strong>{" "}
-                    {mapAddress || "Click on map to select"}
+                    <span className={mapAddress === "Loading address..." ? "text-blue-600" : ""}>
+                      {mapAddress || "Click on map to select"}
+                    </span>
                   </p>
                 </div>
                 <div className="mt-3 flex justify-end">
                   <Button
-                    disabled={!mapAddress}
+                    disabled={!mapAddress || mapAddress === "Loading address..."}
                     className="w-full"
                     onClick={() => {
                       if (activeField === "pickup") {
