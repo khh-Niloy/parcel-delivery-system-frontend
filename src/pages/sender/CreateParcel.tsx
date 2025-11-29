@@ -93,9 +93,11 @@ export default function CreateParcel() {
   );
   // Default to Dhaka, Bangladesh coordinates
   const defaultPos = { lat: 23.8103, lng: 90.4125 };
-  
+
   // Temporary selection inside modal
-  const [mapPos, setMapPos] = React.useState<{ lat: number; lng: number }>(defaultPos);
+  const [mapPos, setMapPos] = React.useState<{ lat: number; lng: number }>(
+    defaultPos
+  );
   const [mapAddress, setMapAddress] = React.useState<string>("");
   // Persisted positions for each field
   const [pickupPos, setPickupPos] = React.useState<{
@@ -108,105 +110,111 @@ export default function CreateParcel() {
   }>(defaultPos);
 
   // Function to fetch address from coordinates
-  const fetchAddressFromCoords = React.useCallback(async (lat: number, lng: number) => {
-    setMapAddress("Loading address...");
-    
-    // Try multiple geocoding services in order of preference
-    const geocodingServices = [
-      {
-        name: 'Nominatim (Proxy)',
-        url: `/nominatim/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&accept-language=en`,
-        parseResponse: (data: any) => data,
-        condition: () => import.meta.env.DEV
-      },
-      {
-        name: 'BigDataCloud',
-        url: `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`,
-        parseResponse: (data: any) => {
-          if (data && (data.locality || data.city)) {
-            const addressParts = [
-              data.locality || data.city,
-              data.principalSubdivision,
-              data.countryName
-            ].filter(Boolean);
-            return { display_name: addressParts.join(', ') };
-          }
-          return null;
-        },
-        condition: () => true
-      },
-      {
-        name: 'Nominatim (Direct)',
-        url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&accept-language=en`,
-        parseResponse: (data: any) => data,
-        condition: () => !import.meta.env.DEV
-      }
-    ];
+  const fetchAddressFromCoords = React.useCallback(
+    async (lat: number, lng: number) => {
+      setMapAddress("Loading address...");
 
-    for (const service of geocodingServices) {
-      if (!service.condition()) continue;
-      
-      try {
-        console.log(`Trying ${service.name}:`, service.url);
-        
-        const headers: HeadersInit = {
-          'Accept': 'application/json',
-        };
-        
-        // Add User-Agent for direct Nominatim calls
-        if (service.name.includes('Nominatim') && !import.meta.env.DEV) {
-          headers['User-Agent'] = 'ParcelDeliveryApp/1.0';
-        }
-        
-        const res = await fetch(service.url, {
-          method: 'GET',
-          headers,
-          ...(import.meta.env.DEV && service.name.includes('Proxy') ? { credentials: 'same-origin' } : {})
-        });
-        
-        if (!res.ok) {
-          throw new Error(`${service.name} failed: ${res.status} ${res.statusText}`);
-        }
-        
-        const rawData = await res.json();
-        const data = service.parseResponse(rawData);
-        
-        console.log(`${service.name} response:`, data);
-        
-        if (data && data.display_name) {
-          setMapAddress(data.display_name);
-          return; // Success, exit the loop
-        } else if (data && data.address) {
-          // Try to construct address from address components
-          const addr = data.address;
-          const addressParts = [
-            addr.house_number,
-            addr.road,
-            addr.neighbourhood || addr.suburb,
-            addr.city || addr.town || addr.village,
-            addr.state,
-            addr.country
-          ].filter(Boolean);
-          
-          if (addressParts.length > 0) {
-            setMapAddress(addressParts.join(', '));
-            return; // Success, exit the loop
+      // Try multiple geocoding services in order of preference
+      const geocodingServices = [
+        {
+          name: "Nominatim (Proxy)",
+          url: `/nominatim/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&accept-language=en`,
+          parseResponse: (data: any) => data,
+          condition: () => import.meta.env.DEV,
+        },
+        {
+          name: "BigDataCloud",
+          url: `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`,
+          parseResponse: (data: any) => {
+            if (data && (data.locality || data.city)) {
+              const addressParts = [
+                data.locality || data.city,
+                data.principalSubdivision,
+                data.countryName,
+              ].filter(Boolean);
+              return { display_name: addressParts.join(", ") };
+            }
+            return null;
+          },
+          condition: () => true,
+        },
+        {
+          name: "Nominatim (Direct)",
+          url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18&accept-language=en`,
+          parseResponse: (data: any) => data,
+          condition: () => !import.meta.env.DEV,
+        },
+      ];
+
+      for (const service of geocodingServices) {
+        if (!service.condition()) continue;
+
+        try {
+          console.log(`Trying ${service.name}:`, service.url);
+
+          const headers: HeadersInit = {
+            Accept: "application/json",
+          };
+
+          // Add User-Agent for direct Nominatim calls
+          if (service.name.includes("Nominatim") && !import.meta.env.DEV) {
+            headers["User-Agent"] = "ParcelDeliveryApp/1.0";
           }
+
+          const res = await fetch(service.url, {
+            method: "GET",
+            headers,
+            ...(import.meta.env.DEV && service.name.includes("Proxy")
+              ? { credentials: "same-origin" }
+              : {}),
+          });
+
+          if (!res.ok) {
+            throw new Error(
+              `${service.name} failed: ${res.status} ${res.statusText}`
+            );
+          }
+
+          const rawData = await res.json();
+          const data = service.parseResponse(rawData);
+
+          console.log(`${service.name} response:`, data);
+
+          if (data && data.display_name) {
+            setMapAddress(data.display_name);
+            return; // Success, exit the loop
+          } else if (data && data.address) {
+            // Try to construct address from address components
+            const addr = data.address;
+            const addressParts = [
+              addr.house_number,
+              addr.road,
+              addr.neighbourhood || addr.suburb,
+              addr.city || addr.town || addr.village,
+              addr.state,
+              addr.country,
+            ].filter(Boolean);
+
+            if (addressParts.length > 0) {
+              setMapAddress(addressParts.join(", "));
+              return; // Success, exit the loop
+            }
+          }
+
+          throw new Error(`${service.name} returned no usable address data`);
+        } catch (error) {
+          console.error(`${service.name} failed:`, error);
+          // Continue to next service
         }
-        
-        throw new Error(`${service.name} returned no usable address data`);
-        
-      } catch (error) {
-        console.error(`${service.name} failed:`, error);
-        // Continue to next service
       }
-    }
-    
-    // All services failed, use coordinates as fallback
-    console.warn('All geocoding services failed, using coordinates');
-    setMapAddress(`Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-    toast.error("Could not fetch address. Using coordinates instead.");
-  }, []);
+
+      // All services failed, use coordinates as fallback
+      console.warn("All geocoding services failed, using coordinates");
+      setMapAddress(`Location: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+      toast.error("Could not fetch address. Using coordinates instead.");
+    },
+    []
+  );
 
   // Get user's current location
   const getCurrentLocation = React.useCallback(async () => {
@@ -216,10 +224,10 @@ export default function CreateParcel() {
           const { latitude, longitude } = position.coords;
           const newPos = { lat: latitude, lng: longitude };
           setMapPos(newPos);
-          
+
           // Fetch address for current location
           await fetchAddressFromCoords(latitude, longitude);
-          
+
           if (activeField === "pickup") {
             setPickupPos(newPos);
           } else {
@@ -239,8 +247,16 @@ export default function CreateParcel() {
     resolver: zodResolver(parcelSchema) as any,
     mode: "onBlur",
     defaultValues: {
-      pickupAddress: { address: "", latitude: defaultPos.lat, longitude: defaultPos.lng },
-      deliveryAddress: { address: "", latitude: defaultPos.lat, longitude: defaultPos.lng },
+      pickupAddress: {
+        address: "",
+        latitude: defaultPos.lat,
+        longitude: defaultPos.lng,
+      },
+      deliveryAddress: {
+        address: "",
+        latitude: defaultPos.lat,
+        longitude: defaultPos.lng,
+      },
     } as any,
   });
   const { setValue, getValues, handleSubmit, watch, register } = form as any;
@@ -559,14 +575,22 @@ export default function CreateParcel() {
                   </p>
                   <p>
                     <strong>Address:</strong>{" "}
-                    <span className={mapAddress === "Loading address..." ? "text-blue-600" : ""}>
+                    <span
+                      className={
+                        mapAddress === "Loading address..."
+                          ? "text-blue-600"
+                          : ""
+                      }
+                    >
                       {mapAddress || "Click on map to select"}
                     </span>
                   </p>
                 </div>
                 <div className="mt-3 flex justify-end">
                   <Button
-                    disabled={!mapAddress || mapAddress === "Loading address..."}
+                    disabled={
+                      !mapAddress || mapAddress === "Loading address..."
+                    }
                     className="w-full"
                     onClick={() => {
                       if (activeField === "pickup") {

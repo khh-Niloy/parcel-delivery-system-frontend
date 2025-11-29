@@ -202,7 +202,7 @@ export default function SenderAllParcel() {
                                             </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell>
+                                    {/* <TableCell>
                                         <div key={index} className="space-y-1">
                                             <div>
                                                     {
@@ -215,7 +215,7 @@ export default function SenderAllParcel() {
                                                     }
                                             </div>
                                         </div>
-                                    </TableCell>
+                                    </TableCell> */}
                                     <TableCell>
                                         <div key={index} className="flex gap-2">
                                             <Button

@@ -29,7 +29,8 @@ export const StatusFlow = {
 
   ASSIGNED: {
     next: [Status.PICKEDUP],
-    allowedRoles: [Role.admin, Role.superAdmin, Role.deliveryAgent],  
+    // allowedRoles: [Role.admin, Role.superAdmin, Role.deliveryAgent],  
+    allowedRoles: [Role.deliveryAgent],  
   },
 
   PICKEDUP: {
