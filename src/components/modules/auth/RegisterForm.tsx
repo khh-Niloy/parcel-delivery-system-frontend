@@ -48,7 +48,7 @@ export function RegisterForm({
   })
 
   const [register] = useRegisterMutation()
-
+console.log(form.formState.errors)
   const onSubmit = async(data: z.infer<typeof registerZodSchema>) => {
     try {
       console.log(data)

@@ -31,13 +31,15 @@ export default function AllParcelDeliveryAgent() {
     e.status.includes(Status.PICKEDUP) || e.status.includes(Status.DELIVERED) || e.status.includes(Status.CONFIRMED) || e.status.includes(Status.RETURNED) || e.status.includes(Status.ASSIGNED))
 
     const parcels: any[] = Array.isArray(allowedParcels) ? allowedParcels : []
-    console.log(parcels)
+    console.log("Filtered parcels:", parcels)
+    console.log("Sample parcel structure:", parcels[0])
     const [updateParcel, { isLoading: isUpdating }] = useUpdateParcelStatusMutation()
     const [openDetailsIds, setOpenDetailsIds] = useState<Set<string>>(new Set())
     const [notes, setNotes] = useState<{ [key: string]: string }>({})
     const [updatingParcel, setUpdatingParcel] = useState<string | null>(null)
     const [status, setStatus] = useState(meData?.data?.availableStatus)
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [modalParcelId, setModalParcelId] = useState<string | null>(null)
 
     // Sync local status when user info loads/changes
     useEffect(() => {
@@ -87,7 +89,16 @@ export default function AllParcelDeliveryAgent() {
     }
 
     const handleParcelChangeStatus = async (nextStatus: string, trackingId: string) => {
+        if (!trackingId) {
+            toast.error("Tracking ID is missing")
+            console.error("Tracking ID is undefined or null:", trackingId)
+            return
+        }
+
         const { latitude, longitude } = await getLatLng()
+        console.log("trackingId", trackingId)
+        
+        try {
             const payload = {
                 trackingId: trackingId,
                 status: nextStatus,
@@ -97,13 +108,17 @@ export default function AllParcelDeliveryAgent() {
                     longitude: longitude
                 }
             }
-            console.log(payload)
+            console.log("Payload being sent:", payload)
             const res = await updateParcel(payload).unwrap()
             if (res?.success) {
                 toast.success("Status updated successfully")
                 // Refetch data to update the table
                 refetch()
             }
+        } catch (error: any) {
+            toast.error(error?.data?.message || "Failed to update parcel status")
+            console.error("Update parcel error:", error)
+        }
     }
 
     if (isLoading) {
@@ -147,7 +162,7 @@ export default function AllParcelDeliveryAgent() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {parcels.map((p) => {
+                        {parcels.map((p, index) => {
                             const hasTrackingEvents = Array.isArray(p?.trackingEvents) && p.trackingEvents.length > 0
                             const currentStatus: string = p?.status
                             const nextStatuses: string[] = Array.isArray(StatusFlow[currentStatus as keyof typeof StatusFlow]?.next) ? StatusFlow[currentStatus as keyof typeof StatusFlow].next : [] 
@@ -158,16 +173,28 @@ export default function AllParcelDeliveryAgent() {
                             const canChangeThisStatus = userRole ? allowedRolesForCurrent.includes(userRole) : false
 
                             const handleChangeStatus = async (nextStatus: string) => {
+                                if (!p?.trackingId) {
+                                    toast.error("Tracking ID is missing for this parcel")
+                                    console.error("Parcel data:", p)
+                                    return
+                                }
+
                                 try {
                                     if(nextStatus == Status.DELIVERED){
+                                        console.log("🔍 Opening modal for DELIVERED status")
+                                        console.log("🔍 Setting modal parcel ID to:", p.trackingId)
+                                        setModalParcelId(p.trackingId)
                                         setIsModalOpen(true)
+                                        return
                                     }
                                     if(nextStatus != Status.DELIVERED){
-                                        setUpdatingParcel(p?.trackingId)
-                                        const note = notes[p?.trackingId] || ""
+                                        console.log("🔍 Processing non-DELIVERED status change")
+                                        console.log("🔍 Setting updating parcel to:", p.trackingId)
+                                        setUpdatingParcel(p.trackingId)
+                                        const note = notes[p.trackingId] || ""
                                         const { latitude, longitude } = await getLatLng()
                                         const payload = {
-                                            trackingId: p?.trackingId,
+                                            trackingId: p.trackingId,
                                             status: nextStatus,
                                             note: note,
                                             updatedBy: meData?.data?.role,
@@ -176,7 +203,6 @@ export default function AllParcelDeliveryAgent() {
                                                 longitude: longitude
                                             }
                                         }
-                                        console.log(payload)
                                         const res = await updateParcel(payload).unwrap()
                                         if (res?.success) {
                                             toast.success("Status updated successfully")
@@ -185,13 +211,13 @@ export default function AllParcelDeliveryAgent() {
                                         }
                                         setNotes(prev => {
                                             const newNotes = { ...prev }
-                                            delete newNotes[p?.trackingId]
+                                            delete newNotes[p.trackingId]
                                             return newNotes
                                         })
                                     }
                                 } catch (error: any) {
                                     toast.error(error?.data?.message || "Failed to update status")
-                                    console.error(error)
+                                    console.error("Status change error:", error)
                                 } finally {
                                     setUpdatingParcel(null)
                                 }
@@ -332,26 +358,6 @@ export default function AllParcelDeliveryAgent() {
                                                         disabled={isUpdating || updatingParcel === p?.trackingId || nextStatuses.length === 0 || !canChangeThisStatus}
                                                     />
                                                 </div>
-                                                <div>
-                                                <Dialog open={isModalOpen}>
-    <DialogTrigger>Open</DialogTrigger>
-  <DialogContent>
-    <DialogHeader>
-      <DialogDescription className="flex flex-col gap-5">
-        <button onClick={ async ()=> {
-            setIsModalOpen(false) 
-            await handleAvailableStatus(false) 
-            await handleParcelChangeStatus(Status.DELIVERED, p?.trackingId)
-        }} className="border border-black">Go Offline</button>
-        <button onClick={ async ()=> {
-            setIsModalOpen(false) 
-            await handleParcelChangeStatus(Status.DELIVERED, p?.trackingId)
-        }} className="border border-black">Available</button>
-      </DialogDescription>
-    </DialogHeader>
-  </DialogContent>
-</Dialog>
-                                                </div>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -401,6 +407,43 @@ export default function AllParcelDeliveryAgent() {
                     </TableBody>
                 </Table>
             )}
+
+            {/* Modal for DELIVERED status - moved outside the map loop */}
+            <Dialog open={isModalOpen} onOpenChange={(open) => {
+                setIsModalOpen(open)
+                if (!open) {
+                    setModalParcelId(null)
+                }
+            }}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogDescription className="flex flex-col gap-5">
+                            <p>Parcel {modalParcelId} is being marked as delivered. What would you like to do next?</p>
+                            <button onClick={async () => {
+                                if (!modalParcelId) {
+                                    toast.error("Tracking ID is missing")
+                                    setIsModalOpen(false)
+                                    return
+                                }
+                                setIsModalOpen(false)
+                                setModalParcelId(null)
+                                await handleAvailableStatus(false)
+                                await handleParcelChangeStatus(Status.DELIVERED, modalParcelId)
+                            }} className="border border-black px-4 py-2 rounded">Go Offline</button>
+                            <button onClick={async () => {
+                                if (!modalParcelId) {
+                                    toast.error("Tracking ID is missing")
+                                    setIsModalOpen(false)
+                                    return
+                                }
+                                setIsModalOpen(false)
+                                setModalParcelId(null)
+                                await handleParcelChangeStatus(Status.DELIVERED, modalParcelId)
+                            }} className="border border-black px-4 py-2 rounded">Stay Available</button>
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const registerZodSchema = z.object({
-    name: z
+  name: z
     .string({ message: "Name must be string" })
     .min(2, { message: "Name must be at least 2 characters long." })
     .max(50, { message: "Name cannot exceed 50 characters." }),
@@ -10,51 +10,55 @@ export const registerZodSchema = z.object({
     .email({ message: "Invalid email address format." })
     .min(5, { message: "Email must be at least 5 characters long." })
     .max(100, { message: "Email cannot exceed 100 characters." }),
-    password: z
-          .string({ message: "Password must be string" })
-          .min(8, { message: "Password must be at least 8 characters long." })
-          .regex(/^(?=.*[A-Z])/, {
-              message: "Password must contain at least 1 uppercase letter.",
-          })
-          .regex(/^(?=.*[!@#$%^&*])/, {
-              message: "Password must contain at least 1 special character.",
-          })
-          .regex(/^(?=.*\d)/, {
-              message: "Password must contain at least 1 number.",
-          }),
-          phone: z
-          .string({ message: "Phone Number must be string" })
-          .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
-              message: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
-          }),
-          deliveryAddress: z.object({
-            address: z.string({
-              message: "Delivery address is required",
-            }),
-            latitude: z.number({
-              message: "Delivery address latitude is required",
-            }),
-            longitude: z.number({
-              message: "Delivery address longitude is required",
-            }),
-          }),
-        
-          pickupAddress: z.object({
-            address: z.string({
-              message: "Pickup address is required",
-            }),
-            latitude: z.number({
-              message: "Pickup address latitude is required",
-            }),
-            longitude: z.number({
-              message: "Pickup address longitude is required",
-            }),
-          }),
-      address: z
-          .string({ message: "Address must be string" })
-          .max(200, { message: "Address cannot exceed 200 characters." }),
-    role: z.enum(["RECEIVER", "SENDER"], {
-      message: "Please select a valid role.",
+  password: z
+    .string({ message: "Password must be string" })
+    .min(8, { message: "Password must be at least 8 characters long." })
+    .regex(/^(?=.*[A-Z])/, {
+      message: "Password must contain at least 1 uppercase letter.",
+    })
+    .regex(/^(?=.*[!@#$%^&*])/, {
+      message: "Password must contain at least 1 special character.",
+    })
+    .regex(/^(?=.*\d)/, {
+      message: "Password must contain at least 1 number.",
     }),
-  })
-  
+  phone: z
+    .string({ message: "Phone Number must be string" })
+    .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
+      message:
+        "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX",
+    }),
+  deliveryAddress: z
+    .object({
+      address: z.string({
+        message: "Delivery address is required",
+      }),
+      latitude: z.number({
+        message: "Delivery address latitude is required",
+      }),
+      longitude: z.number({
+        message: "Delivery address longitude is required",
+      }),
+    })
+    .optional(),
+
+  pickupAddress: z
+    .object({
+      address: z.string({
+        message: "Pickup address is required",
+      }),
+      latitude: z.number({
+        message: "Pickup address latitude is required",
+      }),
+      longitude: z.number({
+        message: "Pickup address longitude is required",
+      }),
+    })
+    .optional(),
+  address: z
+    .string({ message: "Address must be string" })
+    .max(200, { message: "Address cannot exceed 200 characters." }),
+  role: z.enum(["RECEIVER", "SENDER"], {
+    message: "Please select a valid role.",
+  }),
+});

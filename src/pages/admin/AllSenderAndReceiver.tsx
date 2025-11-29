@@ -2,10 +2,16 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { Button } from '@/components/ui/button'
 import { useGetAllUsersQuery } from '@/redux/features/user/user.api'
 import { TableLoadingSkeleton } from '@/components/ui/loading'
-import { toast } from 'sonner'
+import { toast } from 'sonner'  
+
+type Address = {
+  address?: string
+  latitude?: number
+  longitude?: number
+}
 
 type AppUser = {
-  address: string
+  address: Address
   auths?: unknown[]
   createdAt: string
   email: string
@@ -31,6 +37,7 @@ function formatDate(iso?: string) {
 
 export default function AllSenderAndReceiver() {
   const { data: users, isLoading, isError } = useGetAllUsersQuery(undefined)
+  console.log(users)
 
   const allSenderAndReceiver: AppUser[] | undefined = users?.filter(
     (user: AppUser) => user.role === 'SENDER' || user.role === 'RECEIVER'
@@ -91,8 +98,8 @@ export default function AllSenderAndReceiver() {
               </TableCell>
               <TableCell className="hidden lg:table-cell">{u.phone}</TableCell>
               <TableCell>{u.role}</TableCell>
-              <TableCell className="hidden xl:table-cell max-w-[260px] truncate" title={u.address}>
-                {u.address}
+              <TableCell className="hidden xl:table-cell max-w-[260px] truncate" title={u.address.address}>
+                {u.address.address}
               </TableCell>
               <TableCell className="hidden 2xl:table-cell">{formatDate(u.createdAt)}</TableCell>
               <TableCell className="text-right">
